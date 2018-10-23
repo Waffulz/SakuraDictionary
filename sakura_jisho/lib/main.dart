@@ -1,30 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:sakura_jisho/user_interface/dictionary_section/dictionary_screen.dart';
+import 'package:sakura_jisho/user_interface/logo/sakura_logo.dart';
 
-void main() => runApp(new SakuraApp());
 
-class SakuraApp extends StatelessWidget {
+void main() => runApp(new MyApp());
+
+class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
       title: 'Sakura',
-      // Hide the debug red label on top right of the app
-      debugShowCheckedModeBanner: false,
-      // Fonts are included in the "fonts" folder and declared in "pubspec.yaml"
-     // theme: new ThemeData(fontFamily: 'LATO'),
       home: new DictionaryPage(),
+      theme: ThemeData(fontFamily: 'Montserrat'),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class DictionaryPage extends StatefulWidget {
-  @override
-  _DictionaryPageState createState() => _DictionaryPageState();
-}
-
-class _DictionaryPageState extends State<DictionaryPage> {
-  @override
-  Widget build(BuildContext context) {
-    return Container();
-  }
-}

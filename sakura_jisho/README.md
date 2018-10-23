@@ -1,6 +1,6 @@
 # sakura_jisho
 
-thesis
+This is the culmination of everything i am
 
 ## Getting Started
 
