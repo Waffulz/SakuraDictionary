@@ -39,6 +39,8 @@ flutter:
   # Images
   assets:
 
+    - assets/database.json
+
     #Adverb background section image
     - images/fuji_img.jpg
 

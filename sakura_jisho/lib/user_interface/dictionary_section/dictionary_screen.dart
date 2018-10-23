@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
+
+//Import of sakura classes
 import 'package:sakura_jisho/color_pallete.dart';
+import 'package:sakura_jisho/models/word_model.dart';
+import 'package:sakura_jisho/services/api.dart';
+
+//Allow async programming
+import 'dart:async';
 
 class DictionaryPage extends StatefulWidget {
   @override
@@ -7,6 +14,53 @@ class DictionaryPage extends StatefulWidget {
 }
 
 class _DictionaryPageState extends State<DictionaryPage> {
+  List<Word> _words = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadWords();
+  }
+
+  _loadWords() async {
+    String fileData =
+        await DefaultAssetBundle.of(context).loadString('assets/database.json');
+    setState(() {
+      _words = WordApi.allWordsFromJson(fileData);
+    });
+  }
+
+  Widget _buildWordsItem(BuildContext context, int index) {
+    Word word = _words[index];
+    return ListTile(
+      title: Text(
+        word.meaning
+      ),
+      subtitle: Text(
+        word.kanaWord
+      ),
+      trailing: Text(
+        word.wordType
+      ),
+    );
+  }
+
+  Widget _buildWordsList() {
+    return RefreshIndicator(
+      onRefresh: refresh,
+      child: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        itemCount: _words.length,
+        itemBuilder: _buildWordsItem,
+      ),
+    );
+  }
+
+  Future<Null> refresh () {
+    _loadWords();
+    return Future<Null>.value();
+  }
+
   //double height = MediaQuery.of(context).size.height;
   @override
   Widget build(BuildContext context) {
@@ -34,9 +88,8 @@ class _DictionaryPageState extends State<DictionaryPage> {
           title: Text(
             'DICCIONARIO',
             style: TextStyle(
-                fontSize: 18.0,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.0),
+              fontWeight: FontWeight.bold,
+            ),
           ),
           actions: <Widget>[
             IconButton(
@@ -47,6 +100,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
             )
           ],
         ),
+        body: _buildWordsList(),
       ),
     );
   }
