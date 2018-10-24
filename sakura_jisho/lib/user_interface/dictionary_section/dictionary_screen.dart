@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:sakura_jisho/user_interface/sections/filter_section.dart';
 
 //Import of sakura classes
-import 'package:sakura_jisho/color_pallete.dart';
+import 'package:sakura_jisho/utils/color_pallete.dart';
 import 'package:sakura_jisho/models/word_model.dart';
 import 'package:sakura_jisho/services/api.dart';
 
 //Allow async programming
 import 'dart:async';
+
+import 'package:sakura_jisho/utils/routes.dart';
 
 class DictionaryPage extends StatefulWidget {
   @override
@@ -32,15 +35,37 @@ class _DictionaryPageState extends State<DictionaryPage> {
 
   Widget _buildWordsItem(BuildContext context, int index) {
     Word word = _words[index];
-    return ListTile(
-      title: Text(
-        word.meaning
-      ),
-      subtitle: Text(
-        word.kanaWord
-      ),
-      trailing: Text(
-        word.wordType
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          //TODO:
+        },
+        child: ListTile(
+          title: Text(
+            word.meaning,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18.0,
+              fontWeight: FontWeight.w600
+            ),
+          ),
+          subtitle: Text(
+            word.kanaWord,
+            style: TextStyle(
+              fontFamily: 'Aozora',
+              fontSize: 16.0,
+              color: Colors.white70
+            ),
+          ),
+          trailing: Text(
+            word.wordType,
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w300
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -61,6 +86,17 @@ class _DictionaryPageState extends State<DictionaryPage> {
     return Future<Null>.value();
   }
 
+  _navigateToFilterSections() {
+    Navigator.of(context).pop(
+        FadePageRoute(
+            builder: (c) {
+              return FilterSection();
+            },
+            settings: RouteSettings()
+        )
+    );
+  }
+
   //double height = MediaQuery.of(context).size.height;
   @override
   Widget build(BuildContext context) {
@@ -79,9 +115,8 @@ class _DictionaryPageState extends State<DictionaryPage> {
                 Icons.arrow_back_ios,
                 color: Colors.white,
               ),
-              onPressed: () {
-                //TODO:
-              }),
+              onPressed: () => _navigateToFilterSections(),
+          ),
           centerTitle: true,
           elevation: 0.0,
           backgroundColor: Colors.transparent,
@@ -100,7 +135,26 @@ class _DictionaryPageState extends State<DictionaryPage> {
             )
           ],
         ),
-        body: _buildWordsList(),
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                darkColor,
+                darkLightColor,
+              ],
+              begin: Alignment.bottomLeft,
+              end: Alignment.topRight
+            )
+          ),
+          child: _buildWordsList()
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            //TODO:
+          },
+          backgroundColor: color,
+          child: Icon(Icons.send)
+        ),
       ),
     );
   }
