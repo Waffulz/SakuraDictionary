@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:sakura_jisho/user_interface/dictionary_section/dictionary_screen.dart';
 import 'package:sakura_jisho/utils/routes.dart';
+import 'package:firebase_database/firebase_database.dart';
+
+final FirebaseDatabase database = FirebaseDatabase.instance;
 
 class FilterSection extends StatefulWidget {
   @override
@@ -12,6 +15,12 @@ class _FilterSectionState extends State<FilterSection> {
   _FilterSectionState({
     this.title
   });
+
+  void _database() {
+    database.reference().child("value").set({
+      "meh": "android"
+    });
+  }
 
   _navigateToDictionary() {
     Navigator.of(context).push(
@@ -48,7 +57,7 @@ class _FilterSectionState extends State<FilterSection> {
           IconButton(
             icon: Icon(Icons.search),
             onPressed: () {
-              //TODO:
+              _database();
             },
           )
         ],
