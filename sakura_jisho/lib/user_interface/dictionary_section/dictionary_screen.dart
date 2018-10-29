@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:sakura_jisho/user_interface/dictionary_section/topPanel.dart';
 import 'package:sakura_jisho/user_interface/sections/filter_section.dart';
 
 //Import of sakura classes
 import 'package:sakura_jisho/utils/color_pallete.dart';
 import 'package:sakura_jisho/models/word_model.dart';
 import 'package:sakura_jisho/services/api.dart';
+import 'package:sakura_jisho/utils/font_styles.dart';
 
 //Allow async programming
 import 'dart:async';
@@ -17,6 +19,7 @@ class DictionaryPage extends StatefulWidget {
 }
 
 class _DictionaryPageState extends State<DictionaryPage> {
+  OpenableController openableController;
   List<Word> _words = [];
 
   @override
@@ -44,26 +47,15 @@ class _DictionaryPageState extends State<DictionaryPage> {
         child: ListTile(
           title: Text(
             word.meaning,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18.0,
-              fontWeight: FontWeight.w600
-            ),
+            style: CustomTextStyle.h2Text(context),
           ),
           subtitle: Text(
             word.kanaWord,
-            style: TextStyle(
-              fontFamily: 'Aozora',
-              fontSize: 16.0,
-              color: Colors.white70
-            ),
+            style: CustomTextStyle.kanaText(context),
           ),
           trailing: Text(
             word.wordType,
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w300
-            ),
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w300),
           ),
         ),
       ),
@@ -81,81 +73,98 @@ class _DictionaryPageState extends State<DictionaryPage> {
     );
   }
 
-  Future<Null> refresh () {
+  Future<Null> refresh() {
     _loadWords();
     return Future<Null>.value();
   }
 
   _navigateToFilterSections() {
-    Navigator.of(context).pop(
-        FadePageRoute(
-            builder: (c) {
-              return FilterSection();
-            },
-            settings: RouteSettings()
-        )
-    );
+    Navigator.of(context).pop(FadePageRoute(
+        builder: (c) {
+          return FilterSection();
+        },
+        settings: RouteSettings()));
   }
 
   //double height = MediaQuery.of(context).size.height;
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [
-          colorAccent,
-          color,
-        ]),
-      ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          leading: IconButton(
-              icon: Icon(
-                Icons.arrow_back_ios,
-                color: Colors.white,
-              ),
-              onPressed: () => _navigateToFilterSections(),
-          ),
-          centerTitle: true,
-          elevation: 0.0,
-          backgroundColor: Colors.transparent,
-          title: Text(
-            'DICCIONARIO',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
+    return Stack(
+      children: <Widget>[
+        Align(
+          alignment: Alignment.topCenter,
+          child: Container(
+            height: MediaQuery.of(context).size.height * 0.41,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(
+                  'images/sakura_temple_img.jpeg',
+                ),
+                fit: BoxFit.cover
+              )
             ),
           ),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.search, color: Colors.white),
-              onPressed: () {
-                //TODO:
-              },
-            )
-          ],
         ),
-        body: Container(
+        Container(
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                darkColor,
-                darkLightColor,
-              ],
-              begin: Alignment.bottomLeft,
-              end: Alignment.topRight
-            )
+            gradient: LinearGradient(colors: [
+              colorLeft,
+              colorRight,
+            ],),
           ),
-          child: _buildWordsList()
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            appBar: AppBar(
+              leading: IconButton(
+                icon: Icon(
+                  Icons.arrow_back_ios,
+                  color: Colors.white,
+                ),
+                onPressed: () => _navigateToFilterSections(),
+              ),
+              centerTitle: true,
+              elevation: 0.0,
+              backgroundColor: Colors.transparent,
+              title: Text(
+                'DICCIONARIO',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              actions: <Widget>[
+                IconButton(
+                  icon: Icon(Icons.search, color: Colors.white),
+                  onPressed: () {
+                    openableController.close();
+                  },
+                )
+              ],
+            ),
+            body: Column(
+              children: <Widget>[
+                TopPanel(),
+                Expanded(
+                  child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                          gradient: LinearGradient(colors: [
+                        darkColor,
+                        darkLightColor,
+                      ], begin: Alignment.bottomLeft, end: Alignment.topRight)),
+                      child: _buildWordsList()),
+                ),
+              ],
+            ),
+            floatingActionButton: FloatingActionButton(
+                onPressed: () {
+                  //TODO:
+                },
+                backgroundColor: colorRight,
+                child: Icon(Icons.send)),
+          ),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            //TODO:
-          },
-          backgroundColor: color,
-          child: Icon(Icons.send)
-        ),
-      ),
+      ],
     );
   }
 }

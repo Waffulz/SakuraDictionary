@@ -16,11 +16,6 @@ class _FilterSectionState extends State<FilterSection> {
     this.title
   });
 
-  void _database() {
-    database.reference().child("value").set({
-      "meh": "android"
-    });
-  }
 
   _navigateToDictionary() {
     Navigator.of(context).push(
@@ -57,7 +52,7 @@ class _FilterSectionState extends State<FilterSection> {
           IconButton(
             icon: Icon(Icons.search),
             onPressed: () {
-              _database();
+              //TODO:
             },
           )
         ],
