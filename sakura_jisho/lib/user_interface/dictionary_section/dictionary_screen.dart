@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sakura_jisho/user_interface/dictionary_section/topPanel.dart';
 import 'package:sakura_jisho/user_interface/sections/filter_section.dart';
+import 'dart:math' as math;
 
 //Import of sakura classes
 import 'package:sakura_jisho/utils/color_pallete.dart';
@@ -81,16 +82,157 @@ class _DictionaryPageState extends State<DictionaryPage> {
               ],
             ),
             body: TopPanel(),
-            floatingActionButton: FloatingActionButton(
-                onPressed: () {
-                  //TODO:
-                },
-                backgroundColor: colorRight,
-                child: Icon(Icons.send)
+          ),
+        ),
+        Positioned(top: MediaQuery.of(context).size.height * 0.8,
+            left: MediaQuery.of(context).size.width * 0.65,
+            child: OptionsFab()),
+      ],
+    );
+  }
+}
+
+class OptionsFab extends StatefulWidget {
+  @override
+  _OptionsFabState createState() => _OptionsFabState();
+}
+
+class _OptionsFabState extends State<OptionsFab>
+    with SingleTickerProviderStateMixin {
+  AnimationController _animationController;
+  Animation<Color> _colorAnimation;
+  double expandedSize = 180.0;
+  double hiddenSize = 20.0;
+
+  //Functions used in Fuctions
+  @override
+  void initState() {
+    super.initState();
+    _animationController = new AnimationController(
+        vsync: this, duration: Duration(milliseconds: 200));
+    _colorAnimation = new ColorTween(begin: pink, end: purple)
+        .animate(_animationController)
+          ..addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  open() {
+    if (_animationController.isDismissed) {
+      _animationController.forward();
+    }
+  }
+
+  close() {
+    if (_animationController.isCompleted) {
+      _animationController.reverse();
+    }
+  }
+
+  //Functions used in widgets
+  _onFabTap() {
+    if (_animationController.isDismissed) {
+      open();
+    } else {
+      close();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: expandedSize,
+      height: expandedSize,
+      child: AnimatedBuilder(
+        animation: _animationController,
+        builder: (BuildContext context, Widget child) {
+          return new Stack(
+            alignment: Alignment.center,
+            children: <Widget>[
+              _expandedBackgroudBuilder(),
+              _optionIconBuilder(Icons.filter_list, 0.0),
+              _optionIconBuilder(Icons.translate, - math.pi / 2),
+              _fabBuilder(),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  //Widget builders
+  Widget _fabBuilder() {
+    double scaleFactor = 2 * (_animationController.value - 0.5).abs();
+    return FloatingActionButton(
+      onPressed: () => _onFabTap(),
+      child: Transform(
+        alignment: Alignment.center,
+        transform: new Matrix4.identity()..scale(1.0, scaleFactor),
+        child: Icon(
+          _animationController.value > 0.5 ? Icons.close : Icons.filter_list,
+          color: Colors.white,
+          size: 26.0,
+        ),
+      ),
+      backgroundColor: _colorAnimation.value,
+    );
+  }
+
+  Widget _expandedBackgroudBuilder() {
+    double size =
+        hiddenSize + (expandedSize - hiddenSize) * _animationController.value;
+    return Container(
+      height: size,
+      width: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: LinearGradient(
+          colors: [
+            pink,
+            purple
+          ],
+          begin:Alignment.topRight,
+          end: Alignment.bottomLeft
+        )
+      ),
+    );
+  }
+
+  Widget _optionIconBuilder(IconData icon, double angle) {
+
+    double iconSize = 0.0;
+    if (_animationController.value > 0.8) {
+      iconSize = 20.0 * (_animationController.value - 0.8) * 5;
+    }
+
+    return Material(
+      color: Colors.transparent,
+      child: Transform.rotate(
+        angle: angle,
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: Padding(
+            padding: EdgeInsets.only(top: 8.0),
+            child: IconButton(
+              onPressed: null,
+              icon: Transform.rotate(
+                angle: -angle,
+                child: Icon(
+                  icon,
+                  color: Colors.white,
+                ),
+              ),
+              iconSize: iconSize,
+              alignment: Alignment.center,
+              padding: EdgeInsets.all(0.0),
             ),
           ),
         ),
-      ],
+      ),
     );
   }
 }
@@ -103,8 +245,8 @@ class VocabularyList extends StatefulWidget {
   @override
   _VocabularyListState createState() => _VocabularyListState();
 }
-class _VocabularyListState extends State<VocabularyList> {
 
+class _VocabularyListState extends State<VocabularyList> {
   List<Word> _words = [];
   @override
   void initState() {
@@ -114,7 +256,7 @@ class _VocabularyListState extends State<VocabularyList> {
 
   _loadWords() async {
     String fileData =
-    await DefaultAssetBundle.of(context).loadString('assets/database.json');
+        await DefaultAssetBundle.of(context).loadString('assets/database.json');
     setState(() {
       _words = WordApi.allWordsFromJson(fileData);
     });
@@ -159,6 +301,7 @@ class _VocabularyListState extends State<VocabularyList> {
     _loadWords();
     return Future<Null>.value();
   }
+
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -166,14 +309,13 @@ class _VocabularyListState extends State<VocabularyList> {
           width: double.infinity,
           decoration: BoxDecoration(
               gradient: LinearGradient(colors: [
-                darkColor,
-                darkLightColor,
-              ], begin: Alignment.bottomLeft, end: Alignment.topRight)),
+            darkColor,
+            darkLightColor,
+          ], begin: Alignment.bottomLeft, end: Alignment.topRight)),
           child: _buildWordsList()),
     );
   }
 }
-
 
 class TopPanel extends StatefulWidget {
   @override
@@ -188,10 +330,8 @@ class _TopPanelState extends State<TopPanel>
   void initState() {
     super.initState();
     openableController = new OpenableController(
-        vsync: this, 
-        openDuration: const Duration(milliseconds: 250)
-    )
-    ..addListener(() => setState(() {}));
+        vsync: this, openDuration: const Duration(milliseconds: 250))
+      ..addListener(() => setState(() {}));
   }
 
   Widget _staticText(String text) {
@@ -248,8 +388,9 @@ class _TopPanelState extends State<TopPanel>
                             ]),
                             TableRow(children: [
                               InkWell(
-                                onTap: openableController.isOpen() ?
-                                    openableController.close : null,
+                                onTap: openableController.isOpen()
+                                    ? openableController.close
+                                    : null,
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: <Widget>[
@@ -288,4 +429,3 @@ class _TopPanelState extends State<TopPanel>
     );
   }
 }
-
