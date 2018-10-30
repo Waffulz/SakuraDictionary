@@ -57,7 +57,7 @@ class _FilterSectionState extends State<FilterSection> {
           )
         ],
       ),
-      body: Column(
+      body: ListView(
         children: <Widget>[
           _sectionCardBuilder(title: 'DICCIONARIO'),
           _sectionCardBuilder(title: 'SUSTANTIVOS'),

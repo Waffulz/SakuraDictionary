@@ -47,22 +47,22 @@ flutter:
     - images/fuji_img.jpg
 
     #Sustantives background section image
-    - images/japanese_crowded_town_img.jpeg
+    - images/japanese_crowded_town_img.jpg
 
     #Counters background section image
-    - images/japanese_lamps_img.jpeg
+    - images/japanese_lamps_img.jpg
 
     #Adjetives background section image
-    - images/japanese_town_img.jpeg
+    - images/japanese_town_img.jpg
 
     #Main Screen and general background image
     - images/sakura_welcome_bg.jpg
 
     #Dictionary background section image
-    - images/sakura_temple_img.jpeg
+    - images/sakura_temple_img.jpg
 
     #Verbs background section image
-    - images/shrimp_img.jpeg
+    - images/shrimp_img.jpg
 
 
 
