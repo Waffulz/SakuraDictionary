@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:sakura_jisho/user_interface/dictionary_section/dictionary_screen.dart';
 import 'package:sakura_jisho/user_interface/vocabulary/add_vocabulary.dart';
 import 'package:sakura_jisho/utils/routes.dart';
-import 'package:firebase_database/firebase_database.dart';
 
-final FirebaseDatabase database = FirebaseDatabase.instance;
+
 
 class FilterSection extends StatefulWidget {
   @override

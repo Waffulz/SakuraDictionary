@@ -1,4 +1,6 @@
+
 import 'package:flutter/material.dart';
+import 'package:sakura_jisho/models/firestore.dart';
 import 'package:sakura_jisho/user_interface/dictionary_section/dictionary_screen.dart';
 import 'package:sakura_jisho/user_interface/logo/sakura_logo.dart';
 import 'package:sakura_jisho/user_interface/sections/filter_section.dart';
@@ -14,7 +16,7 @@ class SakuraApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return new MaterialApp(
       title: 'Sakura',
-      home: new FilterSection(),
+      home: new CrudTries(),
       theme: ThemeData(
         fontFamily: 'Montserrat',
       ),
