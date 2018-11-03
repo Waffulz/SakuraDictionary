@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sakura_jisho/user_interface/dictionary_section/dictionary_screen.dart';
+import 'package:sakura_jisho/user_interface/vocabulary/add_vocabulary.dart';
 import 'package:sakura_jisho/utils/routes.dart';
 import 'package:firebase_database/firebase_database.dart';
 
@@ -28,6 +29,14 @@ class _FilterSectionState extends State<FilterSection> {
     );
   }
 
+  _navigateToAddVocabulary() {
+    Navigator.of(context).push(FadePageRoute(
+        builder: (d) {
+          return AddVocabulary();
+        },
+        settings: RouteSettings()));
+  }
+
   Widget _sectionCardBuilder({String title}) {
     return GestureDetector(
       onTap: () => _navigateToDictionary(),
@@ -47,7 +56,6 @@ class _FilterSectionState extends State<FilterSection> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(icon: Icon(Icons.menu), onPressed: null),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.search),
@@ -57,6 +65,7 @@ class _FilterSectionState extends State<FilterSection> {
           )
         ],
       ),
+      drawer: _drawerBuilder(),
       body: ListView(
         children: <Widget>[
           _sectionCardBuilder(title: 'DICCIONARIO'),
@@ -65,6 +74,20 @@ class _FilterSectionState extends State<FilterSection> {
           _sectionCardBuilder(title: 'ADJETIVOS'),
           _sectionCardBuilder(title: 'CONTADORES'),
           _sectionCardBuilder(title: 'ADVERBIOS'),
+        ],
+      ),
+    );
+  }
+
+  Widget _drawerBuilder() {
+    return Drawer(
+      child: ListView(
+        children: <Widget>[
+          ListTile(
+            leading: Icon(Icons.add_circle_outline),
+            title: Text('Agregar Vocabulario'),
+            onTap: () => _navigateToAddVocabulary(),
+          )
         ],
       ),
     );

@@ -22,7 +22,6 @@ class WordApi {
   static Word _forMapWord(Map<String, dynamic> map) {
     return Word(
       //assign the model objects to a json data field
-      externalId: map['id'],
       meaning: map['meaning'],
       romajiWord: map['romaji_word'],
       kanaWord: map['kana_word'],
