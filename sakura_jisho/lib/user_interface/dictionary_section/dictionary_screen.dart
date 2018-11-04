@@ -1,21 +1,20 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:sakura_jisho/user_interface/dictionary_section/animated_fab.dart';
-import 'package:sakura_jisho/user_interface/dictionary_section/topPanel.dart';
 import 'package:sakura_jisho/user_interface/sections/filter_section.dart';
-import 'package:sakura_jisho/user_interface/vocabulary/add_vocabulary.dart';
-
+import 'package:firebase_database/ui/firebase_animated_list.dart';
 
 //Import of sakura classes
 import 'package:sakura_jisho/utils/color_pallete.dart';
 import 'package:sakura_jisho/models/word_model.dart';
-import 'package:sakura_jisho/services/api.dart';
 import 'package:sakura_jisho/utils/font_styles.dart';
 import 'package:sakura_jisho/utils/open_animation.dart';
-
 
 //Allow async programming
 import 'dart:async';
 import 'package:sakura_jisho/utils/routes.dart';
+
+int wordId = 0;
 
 class DictionaryPage extends StatefulWidget {
   @override
@@ -30,7 +29,6 @@ class _DictionaryPageState extends State<DictionaryPage> {
         },
         settings: RouteSettings()));
   }
-
 
   //double height = MediaQuery.of(context).size.height;
   @override
@@ -88,30 +86,29 @@ class _DictionaryPageState extends State<DictionaryPage> {
             body: TopPanel(),
           ),
         ),
-        Positioned(top: MediaQuery.of(context).size.height * 0.8,
+        Positioned(
+            top: MediaQuery.of(context).size.height * 0.8,
             left: MediaQuery.of(context).size.width * 0.65,
             child: OptionsFab()),
       ],
     );
   }
-
-
 }
-
-
-
 
 class VocabularyList extends StatefulWidget {
   final Function onListTap;
+
   VocabularyList({
     this.onListTap,
   });
+
   @override
   _VocabularyListState createState() => _VocabularyListState();
 }
 
 class _VocabularyListState extends State<VocabularyList> {
   List<Word> _words = [];
+
   @override
   void initState() {
     super.initState();
@@ -122,7 +119,7 @@ class _VocabularyListState extends State<VocabularyList> {
     String fileData =
         await DefaultAssetBundle.of(context).loadString('assets/database.json');
     setState(() {
-      _words = WordApi.allWordsFromJson(fileData);
+      //_words = WordApi.allWordsFromJson(fileData);
     });
   }
 
@@ -133,18 +130,15 @@ class _VocabularyListState extends State<VocabularyList> {
       child: InkWell(
         onTap: widget.onListTap,
         child: ListTile(
-          title: Text(
-            word.meaning,
-            style: CustomTextStyle.h2Text(context),
-          ),
-          subtitle: Text(
-            word.kanaWord,
-            style: CustomTextStyle.kanaText(context),
-          ),
-          trailing: Text(
-            word.wordType,
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w300),
-          ),
+          title: Text('' //word.meaning,
+              //style: CustomTextStyle.h2Text(context),
+              ),
+          subtitle: Text('' //word.kanaWord,
+              //style: CustomTextStyle.kanaText(context),
+              ),
+          trailing: Text('' //word.wordType,
+              //style: TextStyle(color: Colors.white, fontWeight: FontWeight.w300),
+              ),
         ),
       ),
     );
@@ -196,6 +190,10 @@ class _TopPanelState extends State<TopPanel>
     openableController = new OpenableController(
         vsync: this, openDuration: const Duration(milliseconds: 250))
       ..addListener(() => setState(() {}));
+    word = new Word();
+    databaseReference = database.reference().child("vocabulary");
+    databaseReference.onChildAdded.listen(_onEntryAdded);
+    databaseReference.onChildChanged.listen(_onEntryChanged);
   }
 
   Widget _staticText(String text) {
@@ -215,6 +213,26 @@ class _TopPanelState extends State<TopPanel>
     );
   }
 
+  DatabaseReference databaseReference;
+  List<Word> words = List();
+  Word word;
+  final FirebaseDatabase database = FirebaseDatabase.instance;
+
+  void _onEntryAdded(Event event) {
+    setState(() {
+      words.add(Word.fromSnapshot(event.snapshot));
+    });
+  }
+
+  void _onEntryChanged(Event event) {
+    var oldEntry = words.singleWhere((entry) {
+      return entry.key == event.snapshot.key;
+    });
+    setState(() {
+      words[words.indexOf(oldEntry)] = Word.fromSnapshot(event.snapshot);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     double deviceHeight = MediaQuery.of(context).size.height * 0.3;
@@ -231,7 +249,8 @@ class _TopPanelState extends State<TopPanel>
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text('Casa', style: CustomTextStyle.h2Text(context)),
+                      Text(words[wordId].meaning,
+                          style: CustomTextStyle.h2Text(context)),
                       Padding(
                         padding: const EdgeInsets.only(left: 8.0, top: 8.0),
                         child: Table(
@@ -240,15 +259,15 @@ class _TopPanelState extends State<TopPanel>
                           children: [
                             TableRow(children: [
                               _staticText('Traducción:'),
-                              _dynamicText('Simona la mona')
+                              _dynamicText(words[wordId].kanaWord)
                             ]),
                             TableRow(children: [
                               _staticText('Tipo:'),
-                              _dynamicText('Simona la mona')
+                              _dynamicText(words[wordId].wordType)
                             ]),
                             TableRow(children: [
                               _staticText('Descripción:'),
-                              _dynamicText('Simona la mona')
+                              _dynamicText(words[wordId].description)
                             ]),
                             TableRow(children: [
                               InkWell(
@@ -270,11 +289,13 @@ class _TopPanelState extends State<TopPanel>
                                   ],
                                 ),
                               ),
-                              _dynamicText('Simona la mona')
+                              _dynamicText(words[wordId].kanjiExample)
                             ]),
                             TableRow(children: [
-                              _staticText('Nota:'),
-                              _dynamicText('Simona la mona')
+                              _staticText('Caracteristicas:'),
+                              _dynamicText(words[wordId].attributes == null
+                                  ? '...'
+                                  : words[wordId].attributes)
                             ])
                           ],
                         ),
@@ -284,10 +305,29 @@ class _TopPanelState extends State<TopPanel>
                 ],
               )),
         ),
-        VocabularyList(
-          onListTap: () {
-            openableController.open();
-          },
+        Flexible(
+          child: Container(
+            decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    colors: [blueDark, blueLight],
+                    begin: Alignment.bottomLeft,
+                    end: Alignment.topRight)),
+            child: FirebaseAnimatedList(
+                query: databaseReference,
+                itemBuilder: (_, DataSnapshot snapshot,
+                    Animation<double> animation, int index) {
+                  return ListTile(
+                    onTap: () {
+                      wordId = index;
+                      setState(() {});
+                      openableController.open();
+                    },
+                    title: Text(words[index].meaning),
+                    subtitle: Text(words[index].kanaWord),
+                    trailing: Text(words[index].wordType),
+                  );
+                }),
+          ),
         ),
       ],
     );

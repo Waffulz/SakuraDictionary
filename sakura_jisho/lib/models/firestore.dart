@@ -48,7 +48,6 @@ class _CrudTriesState extends State<CrudTries> {
       body: Column(
         children: <Widget>[
           Flexible(
-            flex: 0,
             child: Form(
               key: formKey,
               child: Flex(
@@ -66,66 +65,7 @@ class _CrudTriesState extends State<CrudTries> {
                       validator: (val) => val == "" ? val : null,
                     ),
                   ),
-                  ListTile(
-                    title: TextFormField(
-                      onSaved: (val) => word.subtitle = val,
-                      validator: (val) => val == "" ? val : null,
-                    ),
-                  ),
-                  ListTile(
-                    title: TextFormField(
-                      onSaved: (val) => word.subtitle = val,
-                      validator: (val) => val == "" ? val : null,
-                    ),
-                  ),
-                  ListTile(
-                    title: TextFormField(
-                      onSaved: (val) => word.subtitle = val,
-                      validator: (val) => val == "" ? val : null,
-                    ),
-                  ),
-                  ListTile(
-                    title: TextFormField(
-                      onSaved: (val) => word.subtitle = val,
-                      validator: (val) => val == "" ? val : null,
-                    ),
-                  ),
-                  ListTile(
-                    title: TextFormField(
-                      onSaved: (val) => word.subtitle = val,
-                      validator: (val) => val == "" ? val : null,
-                    ),
-                  ),
-                  ListTile(
-                    title: TextFormField(
-                      onSaved: (val) => word.subtitle = val,
-                      validator: (val) => val == "" ? val : null,
-                    ),
-                  ),
-                  ListTile(
-                    title: TextFormField(
-                      onSaved: (val) => word.subtitle = val,
-                      validator: (val) => val == "" ? val : null,
-                    ),
-                  ),
-                  ListTile(
-                    title: TextFormField(
-                      onSaved: (val) => word.subtitle = val,
-                      validator: (val) => val == "" ? val : null,
-                    ),
-                  ),
-                  ListTile(
-                    title: TextFormField(
-                      onSaved: (val) => word.subtitle = val,
-                      validator: (val) => val == "" ? val : null,
-                    ),
-                  ),
-                  ListTile(
-                    title: TextFormField(
-                      onSaved: (val) => word.subtitle = val,
-                      validator: (val) => val == "" ? val : null,
-                    ),
-                  ),
+
                   ListTile(
                     title: Container(
                       color: Colors.black12,
@@ -142,20 +82,6 @@ class _CrudTriesState extends State<CrudTries> {
               ),
             ),
           ),
-          Flexible(
-            child: FirebaseAnimatedList(
-                query: databaseReference,
-                itemBuilder: (_, DataSnapshot snapshot,
-                    Animation<double> animation, int index) {
-                  return Card(
-                    child: ListTile(
-                      title: Text(words[index].title),
-                      subtitle: Text(words[index].subtitle),
-                    ),
-                  );
-                }
-            ),
-          )
         ],
       ),
     );

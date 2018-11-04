@@ -1,5 +1,4 @@
-//import 'package:firebase_database/firebase_database.dart';
-import 'package:meta/meta.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class Word {
   String key;
@@ -30,19 +29,19 @@ class Word {
       this.attributes
       });
 
-//  Word.fromSnapshot(DataSnapshot snapshot)
-//      : key = snapshot.key,
-//        meaning = snapshot.value["meaning"],
-//        romajiWord = snapshot.value["romajiWord"],
-//        kanaWord = snapshot.value["kanaWord"],
-//        kanjiWord = snapshot.value["kanjiWord"],
-//        description = snapshot.value["description"],
-//        spanishExample = snapshot.value["spanishExample"],
-//        romajiExample = snapshot.value["romajiExample"],
-//        kanaExample = snapshot.value["kanaExample"],
-//        kanjiExample = snapshot.value["kanjiExample"],
-//        wordType = snapshot.value["wordType"],
-//        attributes = snapshot.value["attributes"];
+  Word.fromSnapshot(DataSnapshot snapshot)
+      : key = snapshot.key,
+        meaning = snapshot.value["meaning"],
+        romajiWord = snapshot.value["romajiWord"],
+        kanaWord = snapshot.value["kanaWord"],
+        kanjiWord = snapshot.value["kanjiWord"],
+        description = snapshot.value["description"],
+        spanishExample = snapshot.value["spanishExample"],
+        romajiExample = snapshot.value["romajiExample"],
+        kanaExample = snapshot.value["kanaExample"],
+        kanjiExample = snapshot.value["kanjiExample"],
+        wordType = snapshot.value["wordType"],
+        attributes = snapshot.value["attributes"];
 
   toJason() {
     return {

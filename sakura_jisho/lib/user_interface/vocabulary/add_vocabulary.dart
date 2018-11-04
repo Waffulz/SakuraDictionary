@@ -218,7 +218,6 @@ class _AddVocabularyState extends State<AddVocabulary> {
                           child: Container(
                             child: TextFormField(
                               onSaved: (val) => word.kanjiWord = val,
-                              validator: (val) => val == "" ? val : null,
                               decoration: InputDecoration(labelText: 'Kanji*'),
                             ),
                           ),
@@ -338,29 +337,14 @@ class _AddVocabularyState extends State<AddVocabulary> {
                 ],
               ),
             ),
-            Flexible(
-              child: FirebaseAnimatedList(
-                query: databaseReference,
-                itemBuilder: (_, DataSnapshot snapshot,
-                    Animation<double> animation, int index) {
-                  return Card(
-                    child: ListTile(
-                      title: Text(wordsList[index].meaning),
-                      subtitle: Text(wordsList[index].kanaWord),
-                    ),
-                  );
-                },
-              ),
-            ),
           ],
         ),
-      ],
+      ]
     );
   }
 
   void _onEntryAdded(Event event) {
     setState(() {
-
     });
   }
 }
