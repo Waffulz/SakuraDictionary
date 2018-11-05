@@ -14,7 +14,7 @@
          FlutterApplication and put your custom class here. -->
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="sakura_jisho"
+        android:label="Sakura Diccionario de japonés N5"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
