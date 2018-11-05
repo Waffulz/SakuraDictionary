@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 class CustomTextStyle {
   static TextStyle kanaText(BuildContext context) {
   return Theme.of(context).textTheme.display4.copyWith(
-      fontFamily: 'Aozora',
       fontSize: 16.0,
       color: Colors.white70
     );
@@ -14,6 +13,22 @@ class CustomTextStyle {
         color: Colors.white,
         fontSize: 18.0,
         fontWeight: FontWeight.w600
+    );
+  }
+
+  static TextStyle titleListTile(BuildContext context) {
+    return Theme.of(context).textTheme.display4.copyWith(
+        color: Colors.white,
+        fontSize: 16.0,
+        fontWeight: FontWeight.w500
+    );
+  }
+
+  static TextStyle traillingListTile(BuildContext context) {
+    return Theme.of(context).textTheme.display4.copyWith(
+        color: Colors.white70,
+        fontSize: 14.0,
+        fontWeight: FontWeight.w300
     );
   }
 

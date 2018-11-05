@@ -33,6 +33,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
   //double height = MediaQuery.of(context).size.height;
   @override
   Widget build(BuildContext context) {
+    Icon icon = Icon(Icons.search);
     return Stack(
       children: <Widget>[
         Align(
@@ -78,8 +79,12 @@ class _DictionaryPageState extends State<DictionaryPage> {
               ),
               actions: <Widget>[
                 IconButton(
-                  icon: Icon(Icons.search, color: Colors.white),
-                  onPressed: () {},
+                  icon: icon, color: Colors.white,
+                  onPressed: () {
+                    setState(() {
+                      //TODO:
+                    });
+                  },
                 )
               ],
             ),
@@ -289,7 +294,9 @@ class _TopPanelState extends State<TopPanel>
                                   ],
                                 ),
                               ),
-                              _dynamicText(words[wordId].kanjiExample)
+                              _dynamicText(
+                                  '${words[wordId].kanjiExample}\n'
+                                   '${words[wordId].spanishExample}')
                             ]),
                             TableRow(children: [
                               _staticText('Caracteristicas:'),
@@ -322,9 +329,18 @@ class _TopPanelState extends State<TopPanel>
                       setState(() {});
                       openableController.open();
                     },
-                    title: Text(words[index].meaning),
-                    subtitle: Text(words[index].kanaWord),
-                    trailing: Text(words[index].wordType),
+                    title: Text(
+                      words[index].meaning,
+                      style: CustomTextStyle.titleListTile(context),
+                    ),
+                    subtitle: Text(
+                      words[index].kanaWord,
+                      style: CustomTextStyle.kanaText(context),
+                    ),
+                    trailing: Text(
+                      words[index].wordType,
+                      style: CustomTextStyle.traillingListTile(context),
+                    ),
                   );
                 }),
           ),

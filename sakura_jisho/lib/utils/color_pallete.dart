@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 
 Color blueDark = Color(0xFF21142E);
 Color blueLight = Color(0xFF24435D);
-Color pink = Color(0xE6F72981);
-Color purple = Color(0xE6E827B5);
+Color pinkOpacity = Color(0xE6F72981);
+Color purpleOpacity = Color(0xE6E827B5);
+Color pink = Color(0xFFF72981);
+Color purple = Color(0xFFE827B5);
 
 
-Color colorRight = purple;
-Color colorLeft = pink;
+Color colorRight = purpleOpacity;
+Color colorLeft = pinkOpacity;
 Color darkColor = blueDark;
 Color darkLightColor = blueLight;
 

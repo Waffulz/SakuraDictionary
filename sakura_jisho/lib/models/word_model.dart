@@ -6,6 +6,7 @@ class Word {
   String romajiWord;
   String kanaWord;
   String kanjiWord;
+  String searchIndex;
   String description;
   String spanishExample;
   String romajiExample;
@@ -20,6 +21,7 @@ class Word {
       this.romajiWord,
       this.kanaWord,
       this.kanjiWord,
+      this.searchIndex,
       this.description,
       this.spanishExample,
       this.romajiExample,
@@ -35,6 +37,7 @@ class Word {
         romajiWord = snapshot.value["romajiWord"],
         kanaWord = snapshot.value["kanaWord"],
         kanjiWord = snapshot.value["kanjiWord"],
+        searchIndex = snapshot.value["searchIndex"],
         description = snapshot.value["description"],
         spanishExample = snapshot.value["spanishExample"],
         romajiExample = snapshot.value["romajiExample"],
@@ -49,6 +52,7 @@ class Word {
       "romajiWord": romajiWord,
       "kanaWord": kanaWord,
       "kanjiWord": kanjiWord,
+      "searchIndex": searchIndex,
       "description": description,
       "spanishExample": spanishExample,
       "romajiExample": romajiExample,
