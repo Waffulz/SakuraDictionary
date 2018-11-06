@@ -40,6 +40,6 @@ class SakuraLogo extends StatelessWidget {
           ),
         )
       ],
-    );;
+    );
   }
 }

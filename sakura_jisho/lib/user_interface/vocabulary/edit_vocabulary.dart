@@ -4,13 +4,16 @@ import 'package:sakura_jisho/user_interface/sections/filter_section.dart';
 import 'package:sakura_jisho/utils/routes.dart';
 import 'package:firebase_database/firebase_database.dart';
 
-
-class AddVocabulary extends StatefulWidget {
+class EditVocabulary extends StatefulWidget {
+  int id;
+  EditVocabulary({
+    this.id
+ });
   @override
-  _AddVocabularyState createState() => _AddVocabularyState();
+  _EditVocabularyState createState() => _EditVocabularyState();
 }
 
-class _AddVocabularyState extends State<AddVocabulary> {
+class _EditVocabularyState extends State<EditVocabulary> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   final FirebaseDatabase sakuraDatabase = FirebaseDatabase.instance;
@@ -41,22 +44,22 @@ class _AddVocabularyState extends State<AddVocabulary> {
     wordTypeList = [];
     wordTypeList = wordType
         .map((val) => DropdownMenuItem<String>(
-              child: Text(val),
-              value: val,
-            ))
+      child: Text(val),
+      value: val,
+    ))
         .toList();
   }
 
   List<DropdownMenuItem<String>> adjetiveAtributesList = [];
-  List<String> adjetiveAtributes = ['Tipo い', 'Tipo な'];
+  List<String> adjetiveAttibutes = ['Tipo い', 'Tipo な'];
 
   _loadAdjetiveAttributes() {
     adjetiveAtributesList = [];
-    adjetiveAtributesList = adjetiveAtributes
+    adjetiveAtributesList = adjetiveAttibutes
         .map((val) => DropdownMenuItem<String>(
-              child: Text(val),
-              value: val,
-            ))
+      child: Text(val),
+      value: val,
+    ))
         .toList();
   }
 
@@ -67,9 +70,9 @@ class _AddVocabularyState extends State<AddVocabulary> {
     verbAttibutesList = [];
     verbAttibutesList = verbAttibutes
         .map((val) => DropdownMenuItem<String>(
-              child: Text(val),
-              value: val,
-            ))
+      child: Text(val),
+      value: val,
+    ))
         .toList();
   }
 
@@ -99,9 +102,9 @@ class _AddVocabularyState extends State<AddVocabulary> {
     counterAtributesList = [];
     counterAtributesList = counterAttibutes
         .map((val) => DropdownMenuItem<String>(
-              child: Text(val),
-              value: val,
-            ))
+      child: Text(val),
+      value: val,
+    ))
         .toList();
   }
 
@@ -165,11 +168,11 @@ class _AddVocabularyState extends State<AddVocabulary> {
 
   Widget _appBarBuilder() {
     return AppBar(
-      leading: IconButton(
-        icon: Icon(Icons.arrow_back_ios),
-        onPressed: _navigateToFilterSections,
-      ),
-      title: Text('Añadir Vocabulario'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios),
+          onPressed: _navigateToFilterSections,
+        ),
+      title: Text('Editar Vocabulario'),
     );
   }
 
@@ -317,12 +320,12 @@ class _AddVocabularyState extends State<AddVocabulary> {
                 ),
                 ListTile(
                     title: Padding(
-                  padding: const EdgeInsets.only(right: 80.0),
-                  child: Text(
-                    '* Campos requeridos',
-                    style: TextStyle(fontSize: 12.0, color: Colors.red),
-                  ),
-                )),
+                      padding: const EdgeInsets.only(right: 80.0),
+                      child: Text(
+                        '* Campos requeridos',
+                        style: TextStyle(fontSize: 12.0, color: Colors.red),
+                      ),
+                    )),
                 Container(
                   width: double.infinity,
                   height: 50.0,
@@ -330,6 +333,7 @@ class _AddVocabularyState extends State<AddVocabulary> {
                   child: FlatButton(
                     onPressed: () {
                       _handleSubmit();
+
                     },
                     child: Text('Agregar'),
                   ),

@@ -67,6 +67,7 @@ class _OptionsFabState extends State<OptionsFab>
               _expandedBackgroudBuilder(),
               _optionIconBuilder(Icons.filter_list, 0.0),
               _optionIconBuilder(Icons.translate, - math.pi / 2),
+              _optionIconBuilder(Icons.edit, - math.pi / 4),
               _fabBuilder(),
             ],
           );

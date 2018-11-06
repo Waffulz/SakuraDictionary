@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sakura_jisho/user_interface/dictionary_section/animated_fab.dart';
 import 'package:sakura_jisho/user_interface/sections/filter_section.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
+import 'package:sakura_jisho/user_interface/vocabulary/edit_vocabulary.dart';
 
 //Import of sakura classes
 import 'package:sakura_jisho/utils/color_pallete.dart';
@@ -26,6 +27,14 @@ class _DictionaryPageState extends State<DictionaryPage> {
     Navigator.of(context).pop(FadePageRoute(
         builder: (c) {
           return FilterSection();
+        },
+        settings: RouteSettings()));
+  }
+
+  _navigateToEditVocabulary() {
+    Navigator.of(context).push(FadePageRoute(
+        builder: (d) {
+          return EditVocabulary();
         },
         settings: RouteSettings()));
   }
@@ -79,12 +88,9 @@ class _DictionaryPageState extends State<DictionaryPage> {
               ),
               actions: <Widget>[
                 IconButton(
-                  icon: icon, color: Colors.white,
-                  onPressed: () {
-                    setState(() {
-                      //TODO:
-                    });
-                  },
+                  icon: icon,
+                  color: Colors.white,
+                  onPressed: () => _navigateToEditVocabulary(),
                 )
               ],
             ),
@@ -117,19 +123,19 @@ class _VocabularyListState extends State<VocabularyList> {
   @override
   void initState() {
     super.initState();
-    _loadWords();
+    //_loadWords();
   }
 
-  _loadWords() async {
-    String fileData =
-        await DefaultAssetBundle.of(context).loadString('assets/database.json');
-    setState(() {
-      //_words = WordApi.allWordsFromJson(fileData);
-    });
-  }
+//  _loadWords() async {
+//    String fileData =
+//        await DefaultAssetBundle.of(context).loadString('assets/database.json');
+//    setState(() {
+//      //_words = WordApi.allWordsFromJson(fileData);
+//    });
+//  }
 
   Widget _buildWordsItem(BuildContext context, int index) {
-    Word word = _words[index];
+    //Word word = _words[index];
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -161,7 +167,7 @@ class _VocabularyListState extends State<VocabularyList> {
   }
 
   Future<Null> refresh() {
-    _loadWords();
+    //_loadWords();
     return Future<Null>.value();
   }
 
@@ -294,9 +300,8 @@ class _TopPanelState extends State<TopPanel>
                                   ],
                                 ),
                               ),
-                              _dynamicText(
-                                  '${words[wordId].kanjiExample}\n'
-                                   '${words[wordId].spanishExample}')
+                              _dynamicText('${words[wordId].kanjiExample}\n'
+                                  '${words[wordId].spanishExample}')
                             ]),
                             TableRow(children: [
                               _staticText('Caracteristicas:'),
