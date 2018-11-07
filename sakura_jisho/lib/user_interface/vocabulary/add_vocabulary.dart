@@ -20,10 +20,10 @@ class _AddVocabularyState extends State<AddVocabulary> {
   Word word;
   DatabaseReference databaseReference;
 
-  String selectedWordType = "";
-  String selectedAdjetivoAttribute = "";
-  String selectedVerbAttribute = "";
-  String selectedCounterAttribute = "";
+  String selectedWordType = null;
+  String selectedAdjetivoAttribute = null;
+  String selectedVerbAttribute = null;
+  String selectedCounterAttribute = null;
   String searchIndex = "";
 
   List<DropdownMenuItem<String>> attributesDynamicList = [];

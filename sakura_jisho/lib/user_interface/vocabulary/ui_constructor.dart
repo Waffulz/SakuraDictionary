@@ -1,123 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'package:sakura_jisho/models/word_model.dart';
-
-
-class EditVocabulary extends StatefulWidget {
-  String hintDescription = 'Inserta una Descripción (Opcional)';
-  String hintExample = 'Inserta un ejemplo en español (Opcional)';
-  String hintRomajiExample =
-      'Inserta la traducció utilizando Romaji (Opcional)';
-  String hintKanaExample = 'Inserta la traducción utilizando Kanas (Opcional)';
-  String hintKanjiExample =
-      'Inserta la traducción utilizando Kanjis (Opcional)';
-
-  @override
-  _EditVocabularyState createState() => _EditVocabularyState();
-}
-
-class _EditVocabularyState extends State<EditVocabulary> {
-  var wordMeaning;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _appBarBuilder(),
-      body: _bodyBuilder(),
-    );
-  }
-
-  Widget _appBarBuilder() {
-    return AppBar(
-      title: Text('Editar Vocabulario'),
-    );
-  }
-
-  Widget _bodyBuilder() {
-    return ListView(
-      children: <Widget>[
-        Column(
-          children: <Widget>[
-            Form(
-                child: Flex(
-              direction: Axis.vertical,
-              children: <Widget>[
-                ListTile(
-                    title: _underLineTextFieldBuilder(wordMeaning, 'Palabra')),
-                ListTile(title: _rowBuilder()),
-                SizedBox(height: 10.0),
-                _dropDownBuilder(),
-                SizedBox(height: 10.0),
-                ListTile(
-                    title: _outLineTextFieldBuilder(
-                        wordMeaning, 'Descripción', widget.hintDescription)),
-                ListTile(
-                    title: _outLineTextFieldBuilder(
-                        wordMeaning, 'Ejemplo', widget.hintExample)),
-                ListTile(
-                    title: _outLineTextFieldBuilder(wordMeaning,
-                        'Ejemplo Romaji', widget.hintRomajiExample)),
-                ListTile(
-                    title: _outLineTextFieldBuilder(
-                        wordMeaning, 'Ejemplo Kana', widget.hintKanaExample)),
-                ListTile(
-                    title: _outLineTextFieldBuilder(
-                        wordMeaning, 'Ejemplo Kanji', widget.hintKanjiExample)),
-                _editFlatButtonBuilder()
-              ],
-            ))
-          ],
-        ),
-      ],
-    );
-  }
-
-//ListTile(title: DropDownField()),
-  Widget _underLineTextFieldBuilder(var dynamicValue, String label) {
-    return UnderLineField(dynamicValue: dynamicValue, textFieldLabel: label);
-  }
-
-  Widget _outLineTextFieldBuilder(var dynamicValue, String label, String hint) {
-    return OutLineField(
-      dynamicValue: dynamicValue,
-      textFieldLabel: label,
-      hintText: hint,
-    );
-  }
-
-  Widget _rowBuilder() {
-    return Row(
-      children: <Widget>[
-        Expanded(
-          child: Container(
-              child: _underLineTextFieldBuilder(wordMeaning, 'Romaji')),
-        ),
-        SizedBox(width: 5.0),
-        Expanded(
-          child:
-              Container(child: _underLineTextFieldBuilder(wordMeaning, 'Kana')),
-        ),
-        SizedBox(width: 5.0),
-        Expanded(
-          child: Container(
-              child: _underLineTextFieldBuilder(wordMeaning, 'Kanji')),
-        )
-      ],
-    );
-  }
-
-  Widget _dropDownBuilder() {
-    return DropDownField();
-  }
-
-  Widget _editFlatButtonBuilder() {
-    return Container(
-      color: Colors.black12,
-      width: double.infinity,
-      child: FlatButton(onPressed: () => print(wordMeaning), child: Text('Editar')),
-    );
-  }
-}
 
 class UnderLineField extends StatefulWidget {
   var dynamicValue;
@@ -260,9 +141,9 @@ class _DropDownFieldState extends State<DropDownField> {
 
     wordTypeList = wordType
         .map((val) => DropdownMenuItem<String>(
-      child: Text(val),
-      value: val,
-    ))
+              child: Text(val),
+              value: val,
+            ))
         .toList();
   }
 
@@ -273,9 +154,9 @@ class _DropDownFieldState extends State<DropDownField> {
     adjetiveAtributesList = [];
     adjetiveAtributesList = adjetiveAtributes
         .map((val) => DropdownMenuItem<String>(
-      child: Text(val),
-      value: val,
-    ))
+              child: Text(val),
+              value: val,
+            ))
         .toList();
   }
 
@@ -286,9 +167,9 @@ class _DropDownFieldState extends State<DropDownField> {
     verbAttibutesList = [];
     verbAttibutesList = verbAttibutes
         .map((val) => DropdownMenuItem<String>(
-      child: Text(val),
-      value: val,
-    ))
+              child: Text(val),
+              value: val,
+            ))
         .toList();
   }
 
@@ -318,9 +199,9 @@ class _DropDownFieldState extends State<DropDownField> {
     counterAtributesList = [];
     counterAtributesList = counterAttibutes
         .map((val) => DropdownMenuItem<String>(
-      child: Text(val),
-      value: val,
-    ))
+              child: Text(val),
+              value: val,
+            ))
         .toList();
   }
 }
