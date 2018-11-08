@@ -114,7 +114,7 @@ class _EditVocabularyState extends State<EditVocabulary> {
     _loadCounterAttributes();
 
     word = new Word();
-    databaseReference = sakuraDatabase.reference().child("vocabulary").child('-LQaycMk7q2W9MBts7qc').child('description');
+    databaseReference = sakuraDatabase.reference().child("vocabulary").child('-LQaycMk7q2W9MBts7qc');
     databaseReference.onChildAdded.listen(_onEntryAdded);
   }
 
@@ -152,7 +152,7 @@ class _EditVocabularyState extends State<EditVocabulary> {
         (word.meaning + word.romajiWord + word.kanaWord + word.kanjiWord)
             .toString();
     //save form data to firebase databa se
-    databaseReference.set(word.description);
+    databaseReference.push().set(word.toJason());
   }
 
   @override

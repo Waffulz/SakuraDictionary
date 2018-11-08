@@ -1,6 +1,8 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:sakura_jisho/user_interface/dictionary_section/animated_fab.dart';
+import 'package:sakura_jisho/user_interface/dictionary_section/fab_with_actions.dart';
+import 'package:sakura_jisho/user_interface/dictionary_section/layout.dart';
 import 'package:sakura_jisho/user_interface/sections/filter_section.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:sakura_jisho/user_interface/vocabulary/edit_vocabulary.dart';
@@ -95,13 +97,55 @@ class _DictionaryPageState extends State<DictionaryPage> {
               ],
             ),
             body: TopPanel(),
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.endDocked,
+            floatingActionButton: _buildFab(context),
+            bottomNavigationBar: BottomAppBar(
+              color: Colors.white70,
+              child: Container(
+                height: 50.0,
+                child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text('(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧ Futuras Opciones Aqui')),
+              ),
+            ),
           ),
         ),
-        Positioned(
-            top: MediaQuery.of(context).size.height * 0.8,
-            left: MediaQuery.of(context).size.width * 0.65,
-            child: OptionsFab()),
+//        Positioned(
+//            top: MediaQuery.of(context).size.height * 0.8,
+//            left: MediaQuery.of(context).size.width * 0.65,
+//            child: OptionsFab()),
       ],
+    );
+  }
+
+  String _lastSelected = 'TAB: 0';
+
+  void _selectedFab(int index) {
+    setState(() {
+      _lastSelected = 'FAB: $index';
+    });
+  }
+
+  Widget _buildFab(BuildContext context) {
+    final icons = [Icons.playlist_add, Icons.mode_edit, Icons.delete];
+    return AnchoredOverlay(
+      showOverlay: true,
+      overlayBuilder: (context, offset) {
+        return CenterAbout(
+          position: Offset(offset.dx, offset.dy - icons.length * 35.0),
+          child: FabWithIcons(
+            icons: icons,
+            onIconTapped: _selectedFab,
+          ),
+        );
+      },
+      child: FloatingActionButton(
+        onPressed: () {},
+        child: Icon(Icons.settings),
+        elevation: 2.0,
+        backgroundColor: pink,
+      ),
     );
   }
 }
