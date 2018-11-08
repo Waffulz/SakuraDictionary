@@ -1,7 +1,10 @@
-
 import 'package:flutter/material.dart';
+import 'package:sakura_jisho/user_interface/vocabulary/add_vocabulary.dart';
+import 'package:sakura_jisho/user_interface/vocabulary/edit_vocabulary.dart';
 import 'package:sakura_jisho/utils/color_pallete.dart';
 import 'dart:math' as math;
+
+import 'package:sakura_jisho/utils/routes.dart';
 
 class OptionsFab extends StatefulWidget {
   @override
@@ -23,7 +26,7 @@ class _OptionsFabState extends State<OptionsFab>
         vsync: this, duration: Duration(milliseconds: 200));
     _colorAnimation = new ColorTween(begin: pink, end: purple)
         .animate(_animationController)
-      ..addListener(() => setState(() {}));
+          ..addListener(() => setState(() {}));
   }
 
   @override
@@ -52,9 +55,25 @@ class _OptionsFabState extends State<OptionsFab>
       close();
     }
   }
+  _navigateToAddVocabulary() {
+    Navigator.of(context).push(FadePageRoute(
+        builder: (c) {
+          return AddVocabulary();
+        },
+        settings: RouteSettings()));
+  }
+
+  _navigateToEditVocabulary() {
+    Navigator.of(context).push(FadePageRoute(
+        builder: (d) {
+          return EditVocabulary();
+        },
+        settings: RouteSettings()));
+  }
 
   @override
   Widget build(BuildContext context) {
+
     return SizedBox(
       width: expandedSize,
       height: expandedSize,
@@ -65,9 +84,9 @@ class _OptionsFabState extends State<OptionsFab>
             alignment: Alignment.center,
             children: <Widget>[
               _expandedBackgroudBuilder(),
-              _optionIconBuilder(Icons.filter_list, 0.0),
-              _optionIconBuilder(Icons.translate, - math.pi / 2),
-              _optionIconBuilder(Icons.edit, - math.pi / 4),
+              _optionIconBuilder(Icons.playlist_add, 0.0, _navigateToAddVocabulary),
+              _optionIconBuilder(Icons.mode_edit, -math.pi / 4, _navigateToEditVocabulary),
+              //_optionIconBuilder(Icons.delete_outline, - math.pi / 2),
               _fabBuilder(),
             ],
           );
@@ -103,19 +122,13 @@ class _OptionsFabState extends State<OptionsFab>
       decoration: BoxDecoration(
           shape: BoxShape.circle,
           gradient: LinearGradient(
-              colors: [
-                pink,
-                purple
-              ],
-              begin:Alignment.topRight,
-              end: Alignment.bottomLeft
-          )
-      ),
+              colors: [pink, purple],
+              begin: Alignment.topRight,
+              end: Alignment.bottomLeft)),
     );
   }
 
-  Widget _optionIconBuilder(IconData icon, double angle) {
-
+  Widget _optionIconBuilder(IconData icon, double angle, Function action) {
     double iconSize = 0.0;
     if (_animationController.value > 0.8) {
       iconSize = 20.0 * (_animationController.value - 0.8) * 5;
@@ -130,7 +143,9 @@ class _OptionsFabState extends State<OptionsFab>
           child: Padding(
             padding: EdgeInsets.only(top: 8.0),
             child: IconButton(
-              onPressed: null,
+              onPressed: () {
+                action;
+              },
               icon: Transform.rotate(
                 angle: -angle,
                 child: Icon(
