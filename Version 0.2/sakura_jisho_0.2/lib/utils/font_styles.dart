@@ -8,6 +8,14 @@ class CustomTextStyle {
     );
   }
 
+  static TextStyle filterTitle(BuildContext context) {
+    return Theme.of(context).textTheme.display4.copyWith(
+        color: Colors.white,
+        fontSize: 30.0,
+        fontWeight: FontWeight.bold
+    );
+  }
+
   static TextStyle h2Text(BuildContext context) {
     return Theme.of(context).textTheme.display4.copyWith(
         color: Colors.white,

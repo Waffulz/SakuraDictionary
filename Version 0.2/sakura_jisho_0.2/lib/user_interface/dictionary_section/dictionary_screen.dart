@@ -38,7 +38,9 @@ class _DictionaryPageState extends State<DictionaryPage> {
   _navigateToEditVocabulary() {
     Navigator.of(context).push(FadePageRoute(
         builder: (d) {
-          return EditWord(editingWord: editWord,);
+          return EditWord(
+            editingWord: editWord,
+          );
         },
         settings: RouteSettings()));
   }
@@ -121,15 +123,27 @@ class _DictionaryPageState extends State<DictionaryPage> {
       ],
     );
   }
-    final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
-   _showSnackBar() {
-    print('No se selecciono un objeto');
+
+  final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  _showSnackBar() {
     final snackBar = SnackBar(
-      content: Text('Debes de seleccionar un objeto para completar esta acción'),
+      content:
+          Text('Debes de seleccionar un objeto para completar esta acción'),
       duration: Duration(seconds: 3),
       backgroundColor: Color(0XFF27253D),
     );
     scaffoldKey.currentState.showSnackBar(snackBar);
+  }
+
+  final FirebaseDatabase sakuraDatabase = FirebaseDatabase.instance;
+  DatabaseReference sakuraDatabaseReference;
+  _deleteWord(String key) {
+    sakuraDatabaseReference = sakuraDatabase
+        .reference()
+        .child("vocabulary")
+        .child(key);
+    sakuraDatabaseReference.remove();
   }
 
   Widget _bottomAppBarBuilder() {
@@ -141,12 +155,18 @@ class _DictionaryPageState extends State<DictionaryPage> {
           children: <Widget>[
             Expanded(child: Text('Opciones aqui')),
             IconButton(
-              onPressed: () {},
+              onPressed: () {
+                if (editWord != null) {
+                  _deleteWord(editWord.key);
+                } else {
+                  _showSnackBar();
+                }
+              },
               icon: Icon(Icons.delete),
             ),
             IconButton(
               onPressed: () {
-                if(editWord != null) {
+                if (editWord != null) {
                   _navigateToEditVocabulary();
                 } else {
                   _showSnackBar();
@@ -289,6 +309,18 @@ class TopPanel extends StatefulWidget {
 class _TopPanelState extends State<TopPanel>
     with SingleTickerProviderStateMixin {
   OpenableController openableController;
+  Query query;
+
+  _filterBy() {
+    query = database
+        .reference()
+        .child('vocabulary')
+        .orderByChild('wordType')
+        .equalTo('Verbo');
+    setState(() {
+
+    });
+  }
 
   @override
   void initState() {
@@ -297,9 +329,10 @@ class _TopPanelState extends State<TopPanel>
         vsync: this, openDuration: const Duration(milliseconds: 250))
       ..addListener(() => setState(() {}));
     word = new Word();
-    databaseReference = database.reference().child("vocabulary");
-    databaseReference.onChildAdded.listen(_onEntryAdded);
-    databaseReference.onChildChanged.listen(_onEntryChanged);
+    query = database.reference().child('vocabulary').orderByChild('meaning');
+    query.onChildAdded.listen(_onEntryAdded);
+    query.onChildChanged.listen(_onEntryChanged);
+    query.onChildRemoved.listen(_onEntryRemoved);
   }
 
   Widget _staticText(String text) {
@@ -336,6 +369,12 @@ class _TopPanelState extends State<TopPanel>
     });
     setState(() {
       words[words.indexOf(oldEntry)] = Word.fromSnapshot(event.snapshot);
+    });
+  }
+
+  void _onEntryRemoved(Event event) {
+    setState(() {
+      words.remove(Word.fromSnapshot(event.snapshot));
     });
   }
 
@@ -377,14 +416,12 @@ class _TopPanelState extends State<TopPanel>
                             ]),
                             TableRow(children: [
                               InkWell(
-                                onTap: openableController.isOpen()
-                                    ? openableController.close
-                                    : null,
+                                onTap: () => _filterBy(),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: <Widget>[
                                     Icon(
-                                      Icons.edit,
+                                      Icons.translate,
                                       size: 15.0,
                                       color: Colors.white70,
                                     ),
@@ -420,19 +457,18 @@ class _TopPanelState extends State<TopPanel>
                     begin: Alignment.bottomLeft,
                     end: Alignment.topRight)),
             child: FirebaseAnimatedList(
-                query: databaseReference,
-                itemBuilder: (_, DataSnapshot snapshot,
+                query: query,
+                itemBuilder: (context, DataSnapshot snapshot,
                     Animation<double> animation, int index) {
                   return Material(
                     color: Colors.transparent,
                     child: InkWell(
-                      onTap: (){},
+                      onTap: () {},
                       child: ListTile(
                         onTap: () {
-                          wordId = index;
                           editWord = words[index];
-                          setState(() {
-                          });
+                          wordId = index;
+                          setState(() {});
                           openableController.open();
                         },
                         title: Text(

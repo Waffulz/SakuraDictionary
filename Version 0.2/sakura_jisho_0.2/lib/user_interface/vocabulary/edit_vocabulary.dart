@@ -154,6 +154,18 @@ class _EditWordState extends State<EditWord> {
     sakuraDatabaseReference.set(editText);
   }
 
+  final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  _showSnackBar(String editedField) {
+    final snackBar = SnackBar(
+      content:
+      Text('Se ha editado el campo "$editedField" correctamente'),
+      duration: Duration(seconds: 3),
+      backgroundColor: Color(0XFF27253D),
+    );
+    scaffoldKey.currentState.showSnackBar(snackBar);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -163,6 +175,7 @@ class _EditWordState extends State<EditWord> {
         darkLightColor,
       ], begin: Alignment.bottomLeft, end: Alignment.topRight)),
       child: Scaffold(
+        key: scaffoldKey,
         backgroundColor: Colors.transparent,
         appBar: _appBarBuilder(),
         body: _bodyBuilder(),
@@ -219,6 +232,7 @@ class _EditWordState extends State<EditWord> {
                                 form.save();
                                 _handleSubmit(
                                     key, 'meaning', widget.editingWord.meaning);
+                                _showSnackBar('Palabra');
                                 setState(() {});
                               },
                               icon: Icon(
@@ -245,6 +259,7 @@ class _EditWordState extends State<EditWord> {
                                 form.save();
                                 _handleSubmit(key, 'romajiWord',
                                     widget.editingWord.romajiWord);
+                                _showSnackBar('Romaji');
                                 setState(() {});
                               },
                               icon: Icon(
@@ -271,6 +286,7 @@ class _EditWordState extends State<EditWord> {
                                 form.save();
                                 _handleSubmit(key, 'kanaWord',
                                     widget.editingWord.kanaWord);
+                                _showSnackBar('Kana');
                                 setState(() {});
                               },
                               icon: Icon(
@@ -297,6 +313,7 @@ class _EditWordState extends State<EditWord> {
                                 form.save();
                                 _handleSubmit(key, 'kanjiWord',
                                     widget.editingWord.kanjiWord);
+                                _showSnackBar('Kanji');
                                 setState(() {});
                               },
                               icon: Icon(
@@ -321,6 +338,7 @@ class _EditWordState extends State<EditWord> {
                                   _changeBetweenList(selectedValue);
                                   _handleSubmit(key, 'wordType', selectedValue);
                                   _editWord(key, 'attributes', "");
+                                  _showSnackBar('Tipo de palabra');
                                   setState(() {});
                                 },
                                 style:
@@ -345,6 +363,7 @@ class _EditWordState extends State<EditWord> {
                                   widget.editingWord.attributes = selectedValue;
                                   _handleSubmit(
                                       key, 'attributes', selectedValue);
+                                  _showSnackBar('Característica');
                                   setState(() {});
                                 },
                                 style:
@@ -361,15 +380,19 @@ class _EditWordState extends State<EditWord> {
                         ]),
                         TableRow(children: [
                           _staticText('Descripción:'),
-                          TextFormField(
-                              style: CustomTextStyle.dynamicEditSinglelineText(
-                                  context),
-                              initialValue: widget.editingWord.description,
-                              onSaved: (val) =>
-                                  widget.editingWord.description = val,
-                              validator: (val) => val == "" ? val : null,
-                              decoration:
-                                  InputDecoration.collapsed(hintText: null)),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 10.0),
+                            child: TextFormField(
+                              maxLines: 3,
+                                style: CustomTextStyle.dynamicEditSinglelineText(
+                                    context),
+                                initialValue: widget.editingWord.description,
+                                onSaved: (val) =>
+                                    widget.editingWord.description = val,
+                                validator: (val) => val == "" ? val : null,
+                                decoration:
+                                    InputDecoration.collapsed(hintText: null)),
+                          ),
                           IconButton(
                               onPressed: () {
                                 editedValue = "";
@@ -377,6 +400,7 @@ class _EditWordState extends State<EditWord> {
                                 form.save();
                                 _handleSubmit(key, 'description',
                                     widget.editingWord.description);
+                                _showSnackBar('Descripción');
                                 setState(() {});
                               },
                               icon: Icon(
@@ -386,16 +410,20 @@ class _EditWordState extends State<EditWord> {
                               )),
                         ]),
                         TableRow(children: [
-                          _staticText('Ejemplo español:'),
-                          TextFormField(
-                              style: CustomTextStyle.dynamicEditSinglelineText(
-                                  context),
-                              initialValue: widget.editingWord.spanishExample,
-                              onSaved: (val) =>
-                                  widget.editingWord.spanishExample = val,
-                              validator: (val) => val == "" ? val : null,
-                              decoration:
-                                  InputDecoration.collapsed(hintText: null)),
+                          _staticText('Ejemplo Español:'),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 10.0),
+                            child: TextFormField(
+                                maxLines: 3,
+                                style: CustomTextStyle.dynamicEditSinglelineText(
+                                    context),
+                                initialValue: widget.editingWord.spanishExample,
+                                onSaved: (val) =>
+                                    widget.editingWord.spanishExample = val,
+                                validator: (val) => val == "" ? val : null,
+                                decoration:
+                                    InputDecoration.collapsed(hintText: null)),
+                          ),
                           IconButton(
                               onPressed: () {
                                 editedValue = "";
@@ -403,6 +431,7 @@ class _EditWordState extends State<EditWord> {
                                 form.save();
                                 _handleSubmit(key, 'spanishExample',
                                     widget.editingWord.spanishExample);
+                                _showSnackBar('Ejemplo Español');
                                 setState(() {});
                               },
                               icon: Icon(
@@ -413,15 +442,19 @@ class _EditWordState extends State<EditWord> {
                         ]),
                         TableRow(children: [
                           _staticText('Ejemplo Romaji:'),
-                          TextFormField(
-                              style: CustomTextStyle.dynamicEditSinglelineText(
-                                  context),
-                              initialValue: widget.editingWord.romajiExample,
-                              onSaved: (val) =>
-                                  widget.editingWord.romajiExample = val,
-                              validator: (val) => val == "" ? val : null,
-                              decoration:
-                                  InputDecoration.collapsed(hintText: null)),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 10.0),
+                            child: TextFormField(
+                                maxLines: 3,
+                                style: CustomTextStyle.dynamicEditSinglelineText(
+                                    context),
+                                initialValue: widget.editingWord.romajiExample,
+                                onSaved: (val) =>
+                                    widget.editingWord.romajiExample = val,
+                                validator: (val) => val == "" ? val : null,
+                                decoration:
+                                    InputDecoration.collapsed(hintText: null)),
+                          ),
                           IconButton(
                               onPressed: () {
                                 editedValue = "";
@@ -429,6 +462,7 @@ class _EditWordState extends State<EditWord> {
                                 form.save();
                                 _handleSubmit(key, 'romajiExample',
                                     widget.editingWord.romajiExample);
+                                _showSnackBar('Ejemplo Romaji');
                                 setState(() {});
                               },
                               icon: Icon(
@@ -439,15 +473,19 @@ class _EditWordState extends State<EditWord> {
                         ]),
                         TableRow(children: [
                           _staticText('Ejemplo Kana:'),
-                          TextFormField(
-                              style: CustomTextStyle.dynamicEditSinglelineText(
-                                  context),
-                              initialValue: widget.editingWord.kanaExample,
-                              onSaved: (val) =>
-                                  widget.editingWord.kanaExample = val,
-                              validator: (val) => val == "" ? val : null,
-                              decoration:
-                                  InputDecoration.collapsed(hintText: null)),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 10.0),
+                            child: TextFormField(
+                                maxLines: 3,
+                                style: CustomTextStyle.dynamicEditSinglelineText(
+                                    context),
+                                initialValue: widget.editingWord.kanaExample,
+                                onSaved: (val) =>
+                                    widget.editingWord.kanaExample = val,
+                                validator: (val) => val == "" ? val : null,
+                                decoration:
+                                    InputDecoration.collapsed(hintText: null)),
+                          ),
                           IconButton(
                               onPressed: () {
                                 editedValue = "";
@@ -455,6 +493,7 @@ class _EditWordState extends State<EditWord> {
                                 form.save();
                                 _handleSubmit(key, 'kanaExample',
                                     widget.editingWord.kanaExample);
+                                _showSnackBar('Ejemplo Kana');
                                 setState(() {});
                               },
                               icon: Icon(
@@ -466,6 +505,7 @@ class _EditWordState extends State<EditWord> {
                         TableRow(children: [
                           _staticText('Ejemplo Kanji:'),
                           TextFormField(
+                              maxLines: 3,
                               style: CustomTextStyle.dynamicEditSinglelineText(
                                   context),
                               initialValue: widget.editingWord.kanjiExample,
@@ -481,6 +521,7 @@ class _EditWordState extends State<EditWord> {
                                 form.save();
                                 _handleSubmit(key, 'kanjiExample',
                                     widget.editingWord.kanjiExample);
+                                _showSnackBar('Ejemplo Kanji');
                                 setState(() {});
                               },
                               icon: Icon(
