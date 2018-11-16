@@ -14,10 +14,10 @@ class _FilterSectionState extends State<FilterSection> {
 
   _FilterSectionState({this.title});
 
-  _navigateToDictionary() {
+  _navigateToDictionary(String filterBy) {
     Navigator.of(context).push(FadePageRoute(
         builder: (c) {
-          return DictionaryPage();
+          return DictionaryPage(filterBy);
         },
         settings: RouteSettings()));
   }
@@ -44,7 +44,7 @@ class _FilterSectionState extends State<FilterSection> {
               title: 'DICCIONARIO',
               image: 'images/sakura_temple_img.jpg',
               isOdd: true,
-              action: ()=> _navigateToDictionary(),
+              action: ()=> _navigateToDictionary('Diccionario'),
             ),
             FilterSectionCard(
               height: cardHeight,
@@ -52,6 +52,7 @@ class _FilterSectionState extends State<FilterSection> {
               title: 'SUSTANTIVOS',
               image: 'images/japanese_crowded_town_img.jpg',
               isOdd: false,
+              action: ()=> _navigateToDictionary('Sustantivo'),
             ),
             FilterSectionCard(
               height: cardHeight,
@@ -59,6 +60,7 @@ class _FilterSectionState extends State<FilterSection> {
               title: 'VERBOS',
               image: 'images/shrimp_img.jpg',
               isOdd: true,
+              action: ()=> _navigateToDictionary('Verbo'),
             ),
             FilterSectionCard(
               height: cardHeight,
@@ -66,6 +68,7 @@ class _FilterSectionState extends State<FilterSection> {
               title: 'ADJETIVOS',
               image: 'images/japanese_town_img.jpg',
               isOdd: false,
+              action: ()=> _navigateToDictionary('Adjetivo'),
             ),
             FilterSectionCard(
               height: cardHeight,
@@ -73,6 +76,7 @@ class _FilterSectionState extends State<FilterSection> {
               title: 'CONTADORES',
               image: 'images/japanese_lamps_img.jpg',
               isOdd: true,
+              action: ()=> _navigateToDictionary('Contador'),
             ),
             FilterSectionCard(
               height: cardHeight,
@@ -80,6 +84,7 @@ class _FilterSectionState extends State<FilterSection> {
               title: 'ADVERBIOS',
               image: 'images/fuji_img.jpg',
               isOdd: false,
+              action: ()=> _navigateToDictionary('Adverbio'),
             ),
           ],
         ),

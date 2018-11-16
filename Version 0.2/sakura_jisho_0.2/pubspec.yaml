@@ -101,3 +101,8 @@ flutter:
         - asset: fonts/AozoraMincho-Bold.ttf
           weight: 700
 
+    #Custom Icons Font
+    - family: CustomIcon
+      fonts:
+        - asset: icon/custom_icons.ttf
+

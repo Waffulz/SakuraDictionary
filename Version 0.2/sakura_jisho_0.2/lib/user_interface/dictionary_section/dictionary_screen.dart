@@ -18,10 +18,19 @@ import 'package:sakura_jisho/utils/open_animation.dart';
 import 'dart:async';
 import 'package:sakura_jisho/utils/routes.dart';
 
+int sampleValue = 0;
+bool _showKanji = false;
+bool _showRomaji = false;
 int wordId = 0;
 Word editWord;
+FirebaseDatabase database = FirebaseDatabase.instance;
+Query query = database.reference().child('vocabulary').orderByChild('meaning');
 
 class DictionaryPage extends StatefulWidget {
+  final String filterBy;
+
+  DictionaryPage(this.filterBy);
+
   @override
   _DictionaryPageState createState() => _DictionaryPageState();
 }
@@ -109,7 +118,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                 )
               ],
             ),
-            body: TopPanel(),
+            body: TopPanel(widget.filterBy),
 //            floatingActionButtonLocation:
 //                FloatingActionButtonLocation.endDocked,
 //            floatingActionButton: _buildFab(context),
@@ -138,49 +147,147 @@ class _DictionaryPageState extends State<DictionaryPage> {
 
   final FirebaseDatabase sakuraDatabase = FirebaseDatabase.instance;
   DatabaseReference sakuraDatabaseReference;
+
   _deleteWord(String key) {
-    sakuraDatabaseReference = sakuraDatabase
-        .reference()
-        .child("vocabulary")
-        .child(key);
+    sakuraDatabaseReference =
+        sakuraDatabase.reference().child("vocabulary").child(key);
     sakuraDatabaseReference.remove();
   }
 
+  bool isPressed = true;
+
   Widget _bottomAppBarBuilder() {
     return BottomAppBar(
-      color: Colors.white,
+      color: Colors.black38,
+      elevation: 0.0,
       child: Container(
         height: 50.0,
         child: Row(
           children: <Widget>[
-            Expanded(child: Text('Opciones aqui')),
-            IconButton(
-              onPressed: () {
-                if (editWord != null) {
-                  _deleteWord(editWord.key);
-                } else {
-                  _showSnackBar();
-                }
-              },
-              icon: Icon(Icons.delete),
-            ),
-            IconButton(
-              onPressed: () {
-                if (editWord != null) {
-                  _navigateToEditVocabulary();
-                } else {
-                  _showSnackBar();
-                }
-              },
-              icon: Icon(Icons.mode_edit),
-            ),
-            IconButton(
-              onPressed: () => _navigateToAddVocabulary(),
-              icon: Icon(Icons.playlist_add),
-            )
+            Expanded(
+                child: isPressed
+                    ? _changeLectureMethodButton()
+                    : _lectureMethodRowBuilder()),
           ],
         ),
       ),
+    );
+  }
+
+  void _iconToggle() {
+    setState(() {
+      if (!isPressed) {
+        isPressed = true;
+      } else {
+        isPressed = false;
+      }
+    });
+  }
+
+  Widget _changeLectureMethodButton() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: <Widget>[
+        IconButton(
+          onPressed: () {
+            if (editWord != null) {
+              _deleteWord(editWord.key);
+            } else {
+              _showSnackBar();
+            }
+          },
+          tooltip: 'Elimina la palabra seleccionada',
+          icon: Icon(Icons.delete, color: Colors.white),
+        ),
+        IconButton(
+          onPressed: () {
+            if (editWord != null) {
+              _navigateToEditVocabulary();
+            } else {
+              _showSnackBar();
+            }
+          },
+          tooltip: 'Edita la palabra seleccionada',
+          icon: Icon(
+            Icons.mode_edit,
+            color: Colors.white,
+          ),
+        ),
+        IconButton(
+          tooltip: 'Añade una nueva palabra',
+          onPressed: () => _navigateToAddVocabulary(),
+          icon: Icon(Icons.playlist_add, color: Colors.white),
+        ),
+        IconButton(
+          tooltip: 'Cambia el método de escritura',
+          icon: Icon(Icons.translate, color: Colors.white),
+          onPressed: () {
+            _iconToggle();
+          },
+        ),
+      ],
+    );
+  }
+
+  bool showKanji = false;
+  bool showRomaji = false;
+
+  Widget _lectureMethodRowBuilder() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: <Widget>[
+        FlatButton(
+          child: Container(
+            height: double.infinity,
+            child: Center(
+              child: Text('Romaji',
+                  style: showRomaji
+                      ? CustomTextStyle.show(context)
+                      : CustomTextStyle.hide(context)),
+            ),
+          ),
+          onPressed: () {
+            setState(() {
+              if (!showRomaji) {
+                showRomaji = true;
+                _showRomaji = true;
+              } else {
+                showRomaji = false;
+                _showRomaji = false;
+              }
+            });
+          },
+        ),
+        FlatButton(
+          child: Container(
+            height: double.infinity,
+            child: Center(
+              child: Text('漢字',
+                  style: showKanji
+                      ? CustomTextStyle.show(context)
+                      : CustomTextStyle.hide(context)),
+            ),
+          ),
+          onPressed: () {
+            setState(() {
+              if (!showKanji) {
+                showKanji = true;
+                _showKanji = true;
+              } else {
+                showKanji = false;
+                _showKanji = false;
+              }
+            });
+          },
+        ),
+        IconButton(
+          icon: Icon(Icons.close, color: Colors.white),
+          onPressed: () {
+            setState(() {});
+            _iconToggle();
+          },
+        ),
+      ],
     );
   }
 
@@ -302,6 +409,10 @@ class _VocabularyListState extends State<VocabularyList> {
 }
 
 class TopPanel extends StatefulWidget {
+  final String filterBy;
+
+  TopPanel(this.filterBy);
+
   @override
   _TopPanelState createState() => _TopPanelState();
 }
@@ -309,27 +420,40 @@ class TopPanel extends StatefulWidget {
 class _TopPanelState extends State<TopPanel>
     with SingleTickerProviderStateMixin {
   OpenableController openableController;
-  Query query;
 
-  _filterBy() {
-    query = database
-        .reference()
-        .child('vocabulary')
-        .orderByChild('wordType')
-        .equalTo('Verbo');
-    setState(() {
+  reOrderList() {
+    query = database.reference().child('vocabulary').orderByChild('kanaWord');
+    DrawList();
+    setState(() {});
+  }
 
-    });
+  FilterList(String filterBy) {
+    if (filterBy != 'Diccionario') {
+      query = database
+          .reference()
+          .child('vocabulary')
+          .orderByChild('wordType')
+          .equalTo(filterBy);
+    } else {
+      query = database.reference().child('vocabulary').orderByChild('meaning');
+    }
+    //DrawList();
+    setState(() {});
   }
 
   @override
   void initState() {
-    super.initState();
+    wordId = 0;
     openableController = new OpenableController(
         vsync: this, openDuration: const Duration(milliseconds: 250))
       ..addListener(() => setState(() {}));
     word = new Word();
-    query = database.reference().child('vocabulary').orderByChild('meaning');
+    FilterList(widget.filterBy);
+    DrawList();
+    super.initState();
+  }
+
+  DrawList() {
     query.onChildAdded.listen(_onEntryAdded);
     query.onChildChanged.listen(_onEntryChanged);
     query.onChildRemoved.listen(_onEntryRemoved);
@@ -378,6 +502,7 @@ class _TopPanelState extends State<TopPanel>
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
     double deviceHeight = MediaQuery.of(context).size.height * 0.3;
@@ -404,11 +529,17 @@ class _TopPanelState extends State<TopPanel>
                           children: [
                             TableRow(children: [
                               _staticText('Traducción:'),
-                              _dynamicText(words[wordId].kanaWord)
+                              _dynamicText('${_showRomaji ? words[wordId].romajiWord + "      " : ""}${words[wordId].kanaWord+"      "}${_showKanji ? words[wordId].kanjiWord : ""}',)
                             ]),
                             TableRow(children: [
                               _staticText('Tipo:'),
                               _dynamicText(words[wordId].wordType)
+                            ]),
+                            TableRow(children: [
+                              _staticText('Caracteristicas:'),
+                              _dynamicText(words[wordId].attributes == null
+                                  ? '...'
+                                  : words[wordId].attributes)
                             ]),
                             TableRow(children: [
                               _staticText('Descripción:'),
@@ -416,14 +547,23 @@ class _TopPanelState extends State<TopPanel>
                             ]),
                             TableRow(children: [
                               InkWell(
-                                onTap: () => _filterBy(),
+                                onTap: () {
+                                  setState(() {
+
+                                    if (sampleValue < 2) {
+                                      sampleValue = sampleValue + 1;
+                                    } else {
+                                      sampleValue = 0;
+                                    }
+                                  });
+                                },
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: <Widget>[
                                     Icon(
-                                      Icons.translate,
-                                      size: 15.0,
-                                      color: Colors.white70,
+                                      Icons.compare_arrows,
+                                      size: 16.0,
+                                      color: Colors.white,
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(left: 2.0),
@@ -432,15 +572,15 @@ class _TopPanelState extends State<TopPanel>
                                   ],
                                 ),
                               ),
-                              _dynamicText('${words[wordId].kanjiExample}\n'
-                                  '${words[wordId].spanishExample}')
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  _dynamicText('${sampleValue == 0 ? words[wordId].kanjiExample : sampleValue == 1 ? words[wordId].kanaExample : words[wordId].romajiExample}'),
+                                  _dynamicText('${words[wordId].spanishExample}')
+                                ],
+                              )
                             ]),
-                            TableRow(children: [
-                              _staticText('Caracteristicas:'),
-                              _dynamicText(words[wordId].attributes == null
-                                  ? '...'
-                                  : words[wordId].attributes)
-                            ])
                           ],
                         ),
                       ),
@@ -476,11 +616,11 @@ class _TopPanelState extends State<TopPanel>
                           style: CustomTextStyle.titleListTile(context),
                         ),
                         subtitle: Text(
-                          words[index].kanaWord,
+                          '${_showRomaji ? words[index].romajiWord + "      " : ""}${words[index].kanaWord+"      "}${_showKanji ? words[index].kanjiWord : ""}',
                           style: CustomTextStyle.kanaText(context),
                         ),
                         trailing: Text(
-                          words[index].wordType,
+                          '${index + 1}',
                           style: CustomTextStyle.traillingListTile(context),
                         ),
                       ),
