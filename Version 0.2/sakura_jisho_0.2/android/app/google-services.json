@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "1093651534884-dcpamkq6sllub19p9hohb6pf7510j28b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "dev.happie.sakurajisho",
+            "certificate_hash": "a325389f51f3056187980f78e916591a22910f41"
+          }
+        },
+        {
           "client_id": "1093651534884-f03vvrqvc2k4mbls7rml76t9e7tuncat.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -42,6 +50,13 @@
             {
               "client_id": "1093651534884-f03vvrqvc2k4mbls7rml76t9e7tuncat.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "1093651534884-2e0a4uoq93956eb1i26ejiptjhe6oe8g.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "dev.happie.sakuraJisho"
+              }
             }
           ]
         },

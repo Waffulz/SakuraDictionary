@@ -30,7 +30,7 @@
     'Orden númerico',
     'Máquinas y autos',
     'Pisos',
-    'Bebicas en vaso',
+    'Bebidas en vaso',
     'Cosas pequeñas',
     'Animales grandes',
   ];

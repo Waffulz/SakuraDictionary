@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sakura_jisho/models/word_model.dart';
 import 'package:sakura_jisho/user_interface/sections/filter_section.dart';
+import 'package:sakura_jisho/utils/color_pallete.dart';
 import 'package:sakura_jisho/utils/routes.dart';
 import 'package:firebase_database/firebase_database.dart';
 
@@ -90,7 +91,7 @@ class _AddVocabularyState extends State<AddVocabulary> {
     'Orden númerico',
     'Máquinas y autos',
     'Pisos',
-    'Bebicas en vaso',
+    'Bebidas en vaso',
     'Cosas pequeñas',
     'Animales grandes',
   ];
@@ -148,7 +149,8 @@ class _AddVocabularyState extends State<AddVocabulary> {
     if(word.wordType != null) {
       if (form.validate()) {
         form.save();
-        form.reset();
+        _showSnackBar();
+        //form.reset();
         word.searchIndex =
             (word.meaning + word.romajiWord + word.kanaWord + word.kanjiWord)
                 .toString();
@@ -159,16 +161,44 @@ class _AddVocabularyState extends State<AddVocabulary> {
 
   }
 
+  final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  _showSnackBar() {
+    final snackBar = SnackBar(
+      content:
+      Text('Palabra agregada'),
+      duration: Duration(seconds: 3),
+      backgroundColor: Color(0XFF27253D),
+    );
+    scaffoldKey.currentState.showSnackBar(snackBar);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _appBarBuilder(),
-      body: _bodyBuilder(),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            darkColor,
+            darkLightColor
+          ],
+          begin: Alignment.bottomLeft,
+          end: Alignment.topRight
+        )
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        key: scaffoldKey,
+        appBar: _appBarBuilder(),
+        body: _bodyBuilder(),
+      ),
     );
   }
 
   Widget _appBarBuilder() {
     return AppBar(
+      backgroundColor: Colors.transparent,
+      elevation: 0.0,
       leading: IconButton(
         icon: Icon(Icons.arrow_back_ios),
         onPressed: _navigateToFilterSections,
@@ -181,168 +211,174 @@ class _AddVocabularyState extends State<AddVocabulary> {
     return ListView(children: <Widget>[
       Column(
         children: <Widget>[
-          Form(
-            key: formKey,
-            child: Flex(
-              direction: Axis.vertical,
-              children: <Widget>[
-                ListTile(
-                  title: TextFormField(
-                    onSaved: (val) => word.meaning = val,
-                    validator: (val) => val == "" ? val : null,
-                    decoration: InputDecoration(
-                      labelText: 'Palabra*',
+          Theme(
+            data: ThemeData.dark(
+
+
+            ),
+            child: Form(
+              key: formKey,
+              child: Flex(
+                direction: Axis.vertical,
+                children: <Widget>[
+                  ListTile(
+                    title: TextFormField(
+                      onSaved: (val) => word.meaning = val,
+                      validator: (val) => val == "" ? val : null,
+                      decoration: InputDecoration(
+                        labelText: 'Palabra*',
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(height: 10.0),
-                ListTile(
-                  title: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Container(
-                          child: TextFormField(
-                            onSaved: (val) => word.romajiWord = val,
-                            validator: (val) => val == "" ? val : null,
-                            decoration: InputDecoration(labelText: 'Romaji*'),
+                  SizedBox(height: 10.0),
+                  ListTile(
+                    title: Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Container(
+                            child: TextFormField(
+                              onSaved: (val) => word.romajiWord = val,
+                              validator: (val) => val == "" ? val : null,
+                              decoration: InputDecoration(labelText: 'Romaji*'),
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(width: 5.0),
-                      Expanded(
-                        child: Container(
-                          child: TextFormField(
-                            onSaved: (val) => word.kanaWord = val,
-                            validator: (val) => val == "" ? val : null,
-                            decoration: InputDecoration(labelText: 'Kana*'),
+                        SizedBox(width: 5.0),
+                        Expanded(
+                          child: Container(
+                            child: TextFormField(
+                              onSaved: (val) => word.kanaWord = val,
+                              validator: (val) => val == "" ? val : null,
+                              decoration: InputDecoration(labelText: 'Kana*'),
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(width: 5.0),
-                      Expanded(
-                        child: Container(
-                          child: TextFormField(
-                            onSaved: (val) => word.kanjiWord = val,
-                            decoration: InputDecoration(labelText: 'Kanji*'),
+                        SizedBox(width: 5.0),
+                        Expanded(
+                          child: Container(
+                            child: TextFormField(
+                              onSaved: (val) => word.kanjiWord = val,
+                              decoration: InputDecoration(labelText: 'Kanji*'),
+                            ),
                           ),
-                        ),
-                      )
-                    ],
+                        )
+                      ],
+                    ),
                   ),
-                ),
-                Container(
-                  color: Colors.black26,
-                  child: ListTile(
+                  Container(
+                    color: Colors.black26,
+                    child: ListTile(
+                      title: DropdownButtonHideUnderline(
+                        child: DropdownButton(
+                          value: selectedWordType,
+                          items: wordTypeList,
+                          onChanged: (selectedValue) {
+                            selectedWordType = selectedValue;
+                            selectedCounterAttribute = null;
+                            _changeBetweenList(selectedValue);
+                            word.wordType = selectedValue;
+                            setState(() {});
+                          },
+                          hint: Text('Tipo palabra*'),
+                        ),
+                      ),
+                    ),
+                  ),
+                  ListTile(
                     title: DropdownButtonHideUnderline(
                       child: DropdownButton(
-                        value: selectedWordType,
-                        items: wordTypeList,
+                        value: selectedCounterAttribute,
+                        items: attributesDynamicList,
                         onChanged: (selectedValue) {
-                          selectedWordType = selectedValue;
-                          selectedCounterAttribute = null;
-                          _changeBetweenList(selectedValue);
-                          word.wordType = selectedValue;
+                          selectedCounterAttribute = selectedValue;
+                          word.attributes = selectedValue;
                           setState(() {});
                         },
-                        hint: Text('Tipo palabra*'),
+                        hint: Text('Característica'),
                       ),
                     ),
                   ),
-                ),
-                ListTile(
-                  title: DropdownButtonHideUnderline(
-                    child: DropdownButton(
-                      value: selectedCounterAttribute,
-                      items: attributesDynamicList,
-                      onChanged: (selectedValue) {
-                        selectedCounterAttribute = selectedValue;
-                        word.attributes = selectedValue;
-                        setState(() {});
+                  ListTile(
+                    title: TextFormField(
+                      onSaved: (val) => word.description = val,
+                      maxLines: 3,
+                      decoration: InputDecoration(
+                        labelText: 'Descripción',
+                        hintText: 'Inserta una descripción',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                  ListTile(
+                    title: TextFormField(
+                      onSaved: (val) => word.spanishExample = val,
+                      validator: (val) => val == "" ? val : null,
+                      maxLines: 3,
+                      decoration: InputDecoration(
+                        labelText: 'Ejemplo*',
+                        hintText: 'Traducción en español',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                  ListTile(
+                    title: TextFormField(
+                      onSaved: (val) => word.romajiExample = val,
+                      validator: (val) => val == "" ? val : null,
+                      maxLines: 3,
+                      decoration: InputDecoration(
+                        labelText: 'Ejemplo*',
+                        hintText: 'Traduce el ejemplo usando Romaji',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                  ListTile(
+                    title: TextFormField(
+                      onSaved: (val) => word.kanaExample = val,
+                      validator: (val) => val == "" ? val : null,
+                      maxLines: 3,
+                      decoration: InputDecoration(
+                        labelText: 'Ejemplo Kana*',
+                        hintText: 'Utiliza hiragana y katakana',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                  ListTile(
+                    title: TextFormField(
+                      onSaved: (val) => word.kanjiExample = val,
+                      validator: (val) => val == "" ? val : null,
+                      maxLines: 3,
+                      decoration: InputDecoration(
+                        labelText: 'Ejemplo Kanji*',
+                        hintText: 'Incorpora kanjis en el ejemplo',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                  ListTile(
+                      title: Padding(
+                    padding: const EdgeInsets.only(right: 80.0),
+                    child: Text(
+                      '* Campos requeridos',
+                      style: TextStyle(fontSize: 12.0, color: Colors.red),
+                    ),
+                  )),
+                  Container(
+                    width: double.infinity,
+                    height: 50.0,
+                    color: Colors.black12,
+                    child: FlatButton(
+                      onPressed: () {
+                        _handleSubmit();
                       },
-                      hint: Text('Característica'),
+                      child: Text('Agregar'),
                     ),
                   ),
-                ),
-                ListTile(
-                  title: TextFormField(
-                    onSaved: (val) => word.description = val,
-                    maxLines: 3,
-                    decoration: InputDecoration(
-                      labelText: 'Descripción',
-                      hintText: 'Inserta una descripción',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                ListTile(
-                  title: TextFormField(
-                    onSaved: (val) => word.spanishExample = val,
-                    validator: (val) => val == "" ? val : null,
-                    maxLines: 3,
-                    decoration: InputDecoration(
-                      labelText: 'Ejemplo*',
-                      hintText: 'Traducción en español',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                ListTile(
-                  title: TextFormField(
-                    onSaved: (val) => word.romajiExample = val,
-                    validator: (val) => val == "" ? val : null,
-                    maxLines: 3,
-                    decoration: InputDecoration(
-                      labelText: 'Ejemplo*',
-                      hintText: 'Traduce el ejemplo usando Romaji',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                ListTile(
-                  title: TextFormField(
-                    onSaved: (val) => word.kanaExample = val,
-                    validator: (val) => val == "" ? val : null,
-                    maxLines: 3,
-                    decoration: InputDecoration(
-                      labelText: 'Ejemplo Kana*',
-                      hintText: 'Utiliza hiragana y katakana',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                ListTile(
-                  title: TextFormField(
-                    onSaved: (val) => word.kanjiExample = val,
-                    validator: (val) => val == "" ? val : null,
-                    maxLines: 3,
-                    decoration: InputDecoration(
-                      labelText: 'Ejemplo Kanji*',
-                      hintText: 'Incorpora kanjis en el ejemplo',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                ListTile(
-                    title: Padding(
-                  padding: const EdgeInsets.only(right: 80.0),
-                  child: Text(
-                    '* Campos requeridos',
-                    style: TextStyle(fontSize: 12.0, color: Colors.red),
-                  ),
-                )),
-                Container(
-                  width: double.infinity,
-                  height: 50.0,
-                  color: Colors.black12,
-                  child: FlatButton(
-                    onPressed: () {
-                      _handleSubmit();
-                    },
-                    child: Text('Agregar'),
-                  ),
-                ),
-                SizedBox(height: 25.0),
-              ],
+                  SizedBox(height: 25.0),
+                ],
+              ),
             ),
           ),
         ],

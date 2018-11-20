@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:sakura_jisho/services/autentication.dart';
 import 'package:sakura_jisho/user_interface/dictionary_section/animated_fab.dart';
 import 'package:sakura_jisho/user_interface/dictionary_section/fab_with_actions.dart';
 import 'package:sakura_jisho/user_interface/dictionary_section/layout.dart';
@@ -7,6 +9,7 @@ import 'package:sakura_jisho/user_interface/sections/filter_section.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:sakura_jisho/user_interface/vocabulary/add_vocabulary.dart';
 import 'package:sakura_jisho/user_interface/vocabulary/edit_vocabulary.dart';
+import 'package:sakura_jisho/user_interface/vocabulary/search_page.dart';
 
 //Import of sakura classes
 import 'package:sakura_jisho/utils/color_pallete.dart';
@@ -15,6 +18,7 @@ import 'package:sakura_jisho/utils/font_styles.dart';
 import 'package:sakura_jisho/utils/open_animation.dart';
 
 //Allow async programming
+import 'package:async/async.dart';
 import 'dart:async';
 import 'package:sakura_jisho/utils/routes.dart';
 
@@ -28,8 +32,9 @@ Query query = database.reference().child('vocabulary').orderByChild('meaning');
 
 class DictionaryPage extends StatefulWidget {
   final String filterBy;
+  final String searchBy;
 
-  DictionaryPage(this.filterBy);
+  DictionaryPage(this.filterBy, this.searchBy);
 
   @override
   _DictionaryPageState createState() => _DictionaryPageState();
@@ -58,6 +63,14 @@ class _DictionaryPageState extends State<DictionaryPage> {
     Navigator.of(context).push(FadePageRoute(
         builder: (d) {
           return AddVocabulary();
+        },
+        settings: RouteSettings()));
+  }
+
+  _navigateToSearchPage() {
+    Navigator.of(context).push(FadePageRoute(
+        builder: (c) {
+          return SearchPage();
         },
         settings: RouteSettings()));
   }
@@ -114,11 +127,11 @@ class _DictionaryPageState extends State<DictionaryPage> {
                 IconButton(
                   icon: icon,
                   color: Colors.white,
-                  onPressed: () {},
+                  onPressed: () => _navigateToSearchPage(),
                 )
               ],
             ),
-            body: TopPanel(widget.filterBy),
+            body: TopPanel(widget.filterBy, widget.searchBy),
 //            floatingActionButtonLocation:
 //                FloatingActionButtonLocation.endDocked,
 //            floatingActionButton: _buildFab(context),
@@ -135,10 +148,10 @@ class _DictionaryPageState extends State<DictionaryPage> {
 
   final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
 
-  _showSnackBar() {
+  _showSnackBar(String message) {
     final snackBar = SnackBar(
       content:
-          Text('Debes de seleccionar un objeto para completar esta acción'),
+          Text(message),
       duration: Duration(seconds: 3),
       backgroundColor: Color(0XFF27253D),
     );
@@ -184,40 +197,12 @@ class _DictionaryPageState extends State<DictionaryPage> {
     });
   }
 
+  UserAuth _authApi;
   Widget _changeLectureMethodButton() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: <Widget>[
-        IconButton(
-          onPressed: () {
-            if (editWord != null) {
-              _deleteWord(editWord.key);
-            } else {
-              _showSnackBar();
-            }
-          },
-          tooltip: 'Elimina la palabra seleccionada',
-          icon: Icon(Icons.delete, color: Colors.white),
-        ),
-        IconButton(
-          onPressed: () {
-            if (editWord != null) {
-              _navigateToEditVocabulary();
-            } else {
-              _showSnackBar();
-            }
-          },
-          tooltip: 'Edita la palabra seleccionada',
-          icon: Icon(
-            Icons.mode_edit,
-            color: Colors.white,
-          ),
-        ),
-        IconButton(
-          tooltip: 'Añade una nueva palabra',
-          onPressed: () => _navigateToAddVocabulary(),
-          icon: Icon(Icons.playlist_add, color: Colors.white),
-        ),
+        _editRow(),
         IconButton(
           tooltip: 'Cambia el método de escritura',
           icon: Icon(Icons.translate, color: Colors.white),
@@ -226,6 +211,77 @@ class _DictionaryPageState extends State<DictionaryPage> {
           },
         ),
       ],
+    );
+  }
+  OpenableController openableController;
+  Widget _dialog() {
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Se requiere confirmar la acción'),
+            content: Text('¿Esta seguro que deasea eliminar ${editWord.meaning}?'),
+            actions: <Widget>[
+              FlatButton(
+                  textColor: pink,
+                  child: Text('Eliminar'),
+                  onPressed: () {
+                    _deleteWord(editWord.key);
+                    Navigator.of(context).pop();
+                    _showSnackBar('Se ha eliminado la palabra exitosamente');
+                  }
+              ),
+              FlatButton(
+                color: pink,
+                child: Text('Cancelar'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                textColor: Colors.white,
+              ),
+            ],
+          );
+        }
+    );
+  }
+
+  Widget _editRow() {
+    return Container(
+      child: Row(
+        children: <Widget>[
+          IconButton(
+            onPressed: () {
+              if (editWord != null) {
+                _dialog();
+              } else {
+                _showSnackBar('Debes de seleccionar un objeto para completar esta acción');
+              }
+            },
+            tooltip: 'Elimina la palabra seleccionada',
+            icon: Icon(Icons.delete, color: Colors.white),
+          ),
+          IconButton(
+            onPressed: () {
+              if (editWord != null) {
+                _navigateToEditVocabulary();
+              } else {
+                _showSnackBar('Debes de seleccionar un objeto para completar esta acción');
+              }
+            },
+            tooltip: 'Edita la palabra seleccionada',
+            icon: Icon(
+              Icons.mode_edit,
+              color: Colors.white,
+            ),
+          ),
+          IconButton(
+            tooltip: 'Añade una nueva palabra',
+            onPressed: () => _navigateToAddVocabulary(),
+            icon: Icon(Icons.playlist_add, color: Colors.white),
+          ),
+        ],
+      ),
     );
   }
 
@@ -410,8 +466,9 @@ class _VocabularyListState extends State<VocabularyList> {
 
 class TopPanel extends StatefulWidget {
   final String filterBy;
+  final String searchBy;
 
-  TopPanel(this.filterBy);
+  TopPanel(this.filterBy, this.searchBy);
 
   @override
   _TopPanelState createState() => _TopPanelState();
@@ -427,20 +484,35 @@ class _TopPanelState extends State<TopPanel>
     setState(() {});
   }
 
-  FilterList(String filterBy) {
-    if (filterBy != 'Diccionario') {
+  FilterList(String filterBy, String search) {
+    if (search == "") {
+      if (filterBy != 'Diccionario') {
+        query = database
+            .reference()
+            .child('vocabulary')
+            .orderByChild('wordType')
+            .equalTo(filterBy);
+      } else {
+        query = database
+            .reference()
+            .child('vocabulary')
+            .orderByChild('meaning');
+      }
+    } else {
       query = database
           .reference()
           .child('vocabulary')
-          .orderByChild('wordType')
-          .equalTo(filterBy);
-    } else {
-      query = database.reference().child('vocabulary').orderByChild('meaning');
+          .orderByChild(filterBy)
+          .startAt(search)
+          .endAt('$search\uf8ff');
     }
+
     //DrawList();
     setState(() {});
   }
 
+//      .startAt('cho')
+//      .endAt("cho\uf8ff")
   @override
   void initState() {
     wordId = 0;
@@ -448,7 +520,7 @@ class _TopPanelState extends State<TopPanel>
         vsync: this, openDuration: const Duration(milliseconds: 250))
       ..addListener(() => setState(() {}));
     word = new Word();
-    FilterList(widget.filterBy);
+    FilterList(widget.filterBy, widget.searchBy);
     DrawList();
     super.initState();
   }
@@ -502,134 +574,169 @@ class _TopPanelState extends State<TopPanel>
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
-    double deviceHeight = MediaQuery.of(context).size.height * 0.3;
-    return Column(
-      children: <Widget>[
-        Container(
-          width: double.infinity,
-          height: deviceHeight * (openableController.percentOpen),
-          color: Colors.transparent,
-          child: Container(
-              margin: EdgeInsets.only(left: 20.0, right: 20.0),
-              child: ListView(
-                children: <Widget>[
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(words[wordId].meaning,
-                          style: CustomTextStyle.h2Text(context)),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8.0, top: 8.0),
-                        child: Table(
-                          columnWidths: {0: IntrinsicColumnWidth()},
-                          //defaultColumnWidth: IntrinsicColumnWidth(),
-                          children: [
-                            TableRow(children: [
-                              _staticText('Traducción:'),
-                              _dynamicText('${_showRomaji ? words[wordId].romajiWord + "      " : ""}${words[wordId].kanaWord+"      "}${_showKanji ? words[wordId].kanjiWord : ""}',)
-                            ]),
-                            TableRow(children: [
-                              _staticText('Tipo:'),
-                              _dynamicText(words[wordId].wordType)
-                            ]),
-                            TableRow(children: [
-                              _staticText('Caracteristicas:'),
-                              _dynamicText(words[wordId].attributes == null
-                                  ? '...'
-                                  : words[wordId].attributes)
-                            ]),
-                            TableRow(children: [
-                              _staticText('Descripción:'),
-                              _dynamicText(words[wordId].description)
-                            ]),
-                            TableRow(children: [
-                              InkWell(
-                                onTap: () {
-                                  setState(() {
-
-                                    if (sampleValue < 2) {
-                                      sampleValue = sampleValue + 1;
-                                    } else {
-                                      sampleValue = 0;
-                                    }
-                                  });
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: <Widget>[
-                                    Icon(
-                                      Icons.compare_arrows,
-                                      size: 16.0,
-                                      color: Colors.white,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 2.0),
-                                      child: _staticText('Ejemplo:'),
-                                    )
-                                  ],
+    try {
+      double deviceHeight = MediaQuery.of(context).size.height * 0.3;
+      return Column(
+        children: <Widget>[
+          Container(
+            width: double.infinity,
+            height: deviceHeight * (openableController.percentOpen),
+            color: Colors.transparent,
+            child: Container(
+                margin: EdgeInsets.only(left: 20.0, right: 20.0),
+                child: ListView(
+                  children: <Widget>[
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(words[wordId].meaning,
+                            style: CustomTextStyle.h2Text(context)),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0, top: 8.0),
+                          child: Table(
+                            columnWidths: {0: IntrinsicColumnWidth()},
+                            //defaultColumnWidth: IntrinsicColumnWidth(),
+                            children: [
+                              TableRow(children: [
+                                _staticText('Traducción:'),
+                                _dynamicText(
+                                  '${_showRomaji ? words[wordId].romajiWord + "      " : ""}${words[wordId].kanaWord + "      "}${_showKanji ? words[wordId].kanjiWord : ""}',
+                                )
+                              ]),
+                              TableRow(children: [
+                                _staticText('Tipo:'),
+                                _dynamicText(words[wordId].wordType)
+                              ]),
+                              TableRow(children: [
+                                _staticText('Caracteristicas:'),
+                                _dynamicText(words[wordId].attributes == null
+                                    ? '...'
+                                    : words[wordId].attributes)
+                              ]),
+                              TableRow(children: [
+                                _staticText('Descripción:'),
+                                _dynamicText(words[wordId].description)
+                              ]),
+                              TableRow(children: [
+                                InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      if (sampleValue < 2) {
+                                        sampleValue = sampleValue + 1;
+                                      } else {
+                                        sampleValue = 0;
+                                      }
+                                    });
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: <Widget>[
+                                      Icon(
+                                        Icons.compare_arrows,
+                                        size: 16.0,
+                                        color: Colors.white,
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 2.0),
+                                        child: _staticText('Ejemplo:'),
+                                      )
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  _dynamicText('${sampleValue == 0 ? words[wordId].kanjiExample : sampleValue == 1 ? words[wordId].kanaExample : words[wordId].romajiExample}'),
-                                  _dynamicText('${words[wordId].spanishExample}')
-                                ],
-                              )
-                            ]),
-                          ],
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    _dynamicText(
+                                        '${sampleValue == 0 ? words[wordId].kanjiExample : sampleValue == 1 ? words[wordId].kanaExample : words[wordId].romajiExample}'),
+                                    _dynamicText(
+                                        '${words[wordId].spanishExample}')
+                                  ],
+                                )
+                              ]),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
-              )),
-        ),
-        Flexible(
-          child: Container(
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-                    colors: [blueDark, blueLight],
-                    begin: Alignment.bottomLeft,
-                    end: Alignment.topRight)),
-            child: FirebaseAnimatedList(
-                query: query,
-                itemBuilder: (context, DataSnapshot snapshot,
-                    Animation<double> animation, int index) {
-                  return Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () {},
-                      child: ListTile(
-                        onTap: () {
-                          editWord = words[index];
-                          wordId = index;
-                          setState(() {});
-                          openableController.open();
-                        },
-                        title: Text(
-                          words[index].meaning,
-                          style: CustomTextStyle.titleListTile(context),
-                        ),
-                        subtitle: Text(
-                          '${_showRomaji ? words[index].romajiWord + "      " : ""}${words[index].kanaWord+"      "}${_showKanji ? words[index].kanjiWord : ""}',
-                          style: CustomTextStyle.kanaText(context),
-                        ),
-                        trailing: Text(
-                          '${index + 1}',
-                          style: CustomTextStyle.traillingListTile(context),
-                        ),
-                      ),
+                      ],
                     ),
-                  );
-                }),
+                  ],
+                )),
           ),
+          Flexible(
+            child: Container(
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      colors: [blueDark, blueLight],
+                      begin: Alignment.bottomLeft,
+                      end: Alignment.topRight)),
+              child: FirebaseAnimatedList(
+                  query: query,
+                  itemBuilder: (context, DataSnapshot snapshot,
+                      Animation<double> animation, int index) {
+                    return Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () {},
+                        child: ListTile(
+                          onTap: () {
+                            editWord = words[index];
+                            wordId = index;
+                            setState(() {});
+                            openableController.open();
+                          },
+                          title: Text(
+                            words[index].meaning,
+                            style: CustomTextStyle.titleListTile(context),
+                          ),
+                          subtitle: Text(
+                            '${_showRomaji
+                                ? words[index].romajiWord + "      "
+                                : ""}${words[index].kanaWord +
+                                "      "}${_showKanji
+                                ? words[index].kanjiWord
+                                : ""}',
+                            style: CustomTextStyle.kanaText(context),
+                          ),
+                          trailing: Text(
+                            '${index + 1}',
+                            style: CustomTextStyle.traillingListTile(context),
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+            ),
+          ),
+        ],
+      );
+    } catch (e) {
+      return Container(
+        height: double.infinity,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              darkColor,
+              darkLightColor
+            ],
+            begin: Alignment.bottomLeft,
+            end: Alignment.topRight
+          )
         ),
-      ],
-    );
+        child: Center(
+          child: widget.searchBy == '' ?
+          CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(purple),
+          ) :
+              Text('No hay resultados', style: TextStyle(
+                fontSize: 16.0,
+                color: Colors.white,
+                fontWeight: FontWeight.w300
+              ),),
+        ),
+      );
+    }
   }
 }
